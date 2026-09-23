@@ -1,4 +1,4 @@
-# Not Localhost Showcase
+# !localhost: Showcase
 
 A shared space for the class’s work, built together as we learn Git and GitHub.
 
