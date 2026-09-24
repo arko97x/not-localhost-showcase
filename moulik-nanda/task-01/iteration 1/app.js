@@ -250,7 +250,7 @@
     targetBgColor = targets.bgColor;
 
     // Update active button state
-    document.querySelectorAll('.cappy-action-btn').forEach(btn => {
+    document.querySelectorAll('.mood-btn, .cappy-action-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.emo === emo);
     });
 
@@ -306,70 +306,58 @@
   }
 
   // =========================================================================
-  // PROXIMITY SIGNAL ENGINE
+  // GLASS PROXIMITY ENGINE (Undetected, Detected, Close, Close up)
   // =========================================================================
-  const RSSI_RAGE_ENTER = -55;
-  const RSSI_RAGE_EXIT = -62;
-  const RSSI_ANGRY_ENTER = -73;
-  const RSSI_ANGRY_EXIT = -78;
+  const PROXIMITY_METRICS = [
+    { level: 0, label: 'Undetected', emotion: EMOTIONS.DEFAULT, haptic: null },
+    { level: 1, label: 'Detected', emotion: EMOTIONS.CURIOUS, haptic: 'single' },
+    { level: 2, label: 'Close', emotion: EMOTIONS.ANGRY, haptic: 'double' },
+    { level: 3, label: 'Close up', emotion: EMOTIONS.RAGE, haptic: 'rage' }
+  ];
 
-  function updateProximitySignal(targetRssi) {
-    rawRssi = targetRssi;
+  let currentMetricLevel = 0;
 
-    if (rawRssi <= -95) {
-      filteredRssi = -100;
-      proximityTier = 'NONE';
-      if (dazedEndTime <= performance.now() && currentEmotion !== EMOTIONS.SLEEPY && currentEmotion !== EMOTIONS.SLEEPING) {
-        setCappyEmotion(EMOTIONS.DEFAULT);
+  function setProximityLevel(level, triggerSound = true, cursorAngle = null) {
+    level = Math.max(0, Math.min(3, Math.round(level)));
+
+    if (proximitySlider && document.activeElement !== proximitySlider) {
+      proximitySlider.value = level;
+    }
+
+    const metric = PROXIMITY_METRICS[level];
+    if (proximityValLabel) {
+      proximityValLabel.textContent = metric.label;
+      proximityValLabel.style.color =
+        level === 3 ? 'var(--accent-red)' :
+        level === 2 ? 'var(--accent-red)' :
+        level === 1 ? 'var(--accent-yellow)' : 'var(--cappy-orange)';
+    }
+
+    if (level !== currentMetricLevel) {
+      currentMetricLevel = level;
+      if (triggerSound && metric.haptic) {
+        triggerHapticUI(metric.haptic);
       }
+    }
+
+    // Wake up if asleep when glasses detected
+    if ((currentEmotion === EMOTIONS.SLEEPING || currentEmotion === EMOTIONS.SLEEPY) && level > 0) {
+      dazedEndTime = 0;
+    }
+
+    if (dazedEndTime > performance.now() && level < 3) {
       return;
     }
 
-    // Exponential Moving Average filter
-    filteredRssi = filteredRssi * 0.65 + rawRssi * 0.35;
+    setCappyEmotion(metric.emotion);
 
-    let desiredTier = proximityTier;
-    switch (proximityTier) {
-      case 'SUPER_CLOSE':
-        if (filteredRssi < RSSI_RAGE_EXIT) {
-          desiredTier = (filteredRssi < RSSI_ANGRY_EXIT) ? 'DISTANT' : 'NEAR';
-        }
-        break;
-      case 'NEAR':
-        if (filteredRssi >= RSSI_RAGE_ENTER) {
-          desiredTier = 'SUPER_CLOSE';
-        } else if (filteredRssi < RSSI_ANGRY_EXIT) {
-          desiredTier = 'DISTANT';
-        }
-        break;
-      case 'DISTANT':
-      default:
-        if (filteredRssi >= RSSI_RAGE_ENTER) {
-          desiredTier = 'SUPER_CLOSE';
-        } else if (filteredRssi >= RSSI_ANGRY_ENTER) {
-          desiredTier = 'NEAR';
-        } else {
-          desiredTier = 'DISTANT';
-        }
-        break;
-    }
-
-    if (desiredTier !== proximityTier) {
-      proximityTier = desiredTier;
-
-      if (proximityTier === 'SUPER_CLOSE') {
-        triggerHapticUI('rage');
-        setCappyEmotion(EMOTIONS.RAGE);
-        logSerial(`<span style="color: var(--accent-red); font-weight: 800;">[PERV DETECTED] GLASSHOLE SUPER CLOSE (${Math.round(filteredRssi)} dBm) &rarr; RAGE MODE!</span>`);
-      } else if (proximityTier === 'NEAR') {
-        triggerHapticUI('double');
-        setCappyEmotion(EMOTIONS.ANGRY);
-        logSerial(`<span style="color: var(--accent-red); font-weight: 700;">[PERV DETECTED] Smart glasses nearby (${Math.round(filteredRssi)} dBm) &rarr; Cappy gets ANGRY!</span>`);
-      } else if (proximityTier === 'DISTANT') {
-        triggerHapticUI('single');
-        setCappyEmotion(EMOTIONS.CURIOUS);
-        logSerial(`<span style="color: #d49b00; font-weight: 600;">[PERV DETECTED] Distant smart glasses (${Math.round(filteredRssi)} dBm) &rarr; Cappy is CURIOUS</span>`);
-      }
+    // If Detected (level 1), look directly towards the sunglasses cursor
+    if (level === 1 && cursorAngle !== null) {
+      // Invert delta because canvas is rotated 180° around (CX, CY)
+      saccadeX = -Math.cos(cursorAngle) * 22;
+      saccadeY = -Math.sin(cursorAngle) * 14;
+      tgtL.angle = -30 + Math.sin(cursorAngle) * 15;
+      tgtR.angle = -30 + Math.sin(cursorAngle) * 15;
     }
   }
 
@@ -917,31 +905,85 @@
       });
     }
 
-    // 3. Proximity Slider
+    // 3. Mouse cursor proximity tracking (Glasses cursor approaching Cappy)
+    let isUserDraggingSlider = false;
+    let lastMouseMoveTime = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      if (!cappyChassis || isUserDraggingSlider) return;
+
+      const now = performance.now();
+      if (now - lastMouseMoveTime < 25) return; // ~40fps smooth throttle
+      lastMouseMoveTime = now;
+
+      const rect = cappyChassis.getBoundingClientRect();
+      const cappyCenterX = rect.left + rect.width / 2;
+      const cappyCenterY = rect.top + rect.height / 2;
+
+      const dx = e.clientX - cappyCenterX;
+      const dy = e.clientY - cappyCenterY;
+      const dist = Math.hypot(dx, dy);
+      const cursorAngle = Math.atan2(dy, dx);
+
+      // Distance thresholds:
+      // dist > 520px: Undetected (level 0)
+      // 300px < dist <= 520px: Detected (level 1)
+      // 170px < dist <= 300px: Close (level 2)
+      // dist <= 170px: Close up (level 3 - sunglasses right over Cappy!)
+      let level = 0;
+      if (dist <= 170) {
+        level = 3;
+      } else if (dist <= 300) {
+        level = 2;
+      } else if (dist <= 520) {
+        level = 1;
+      } else {
+        level = 0;
+      }
+
+      setProximityLevel(level, true, cursorAngle);
+    });
+
+    document.addEventListener('mouseleave', () => {
+      if (!isUserDraggingSlider) {
+        setProximityLevel(0, false);
+      }
+    });
+
+    // 4. Proximity Slider
     if (proximitySlider) {
+      proximitySlider.addEventListener('mousedown', () => { isUserDraggingSlider = true; });
+      proximitySlider.addEventListener('touchstart', () => { isUserDraggingSlider = true; }, { passive: true });
+      window.addEventListener('mouseup', () => { setTimeout(() => { isUserDraggingSlider = false; }, 350); });
+      window.addEventListener('touchend', () => { setTimeout(() => { isUserDraggingSlider = false; }, 350); });
+
       proximitySlider.addEventListener('input', (e) => {
         initAudio();
-        const val = parseInt(e.target.value, 10);
-        let label = `${val} dBm`;
-        if (val <= -95) label = '-100 dBm (No Glasses / Safe)';
-        else if (val >= -55) label = `${val} dBm (Super Close - Rage!)`;
-        else if (val >= -73) label = `${val} dBm (Nearby Threat - Angry)`;
-        else label = `${val} dBm (Distant Glasses - Curious)`;
-
-        if (proximityValLabel) proximityValLabel.textContent = label;
-        if (hudRssi) hudRssi.textContent = `${val} dBm`;
-        updateProximitySignal(val);
+        const val = parseFloat(e.target.value);
+        setProximityLevel(val, true, null);
       });
     }
 
-    // 4. Cappy Quick Emotion Buttons
-    document.querySelectorAll('.cappy-action-btn').forEach(btn => {
+    // 5. Cappy Quick Emotion Buttons
+    document.querySelectorAll('.mood-btn, .cappy-action-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         initAudio();
         const emo = btn.dataset.emo;
         if (emo === 'KNOCK') {
           triggerKnock('Control Button');
+        } else if (emo === 'DEFAULT') {
+          setProximityLevel(0, false);
+        } else if (emo === 'CURIOUS') {
+          setProximityLevel(1, true);
+        } else if (emo === 'ANGRY') {
+          setProximityLevel(2, true);
+        } else if (emo === 'RAGE') {
+          setProximityLevel(3, true);
+        } else if (emo === 'SLEEPY' || emo === 'SLEEPING') {
+          setCappyEmotion(emo);
+          if (proximitySlider) proximitySlider.value = 0;
+          if (proximityValLabel) proximityValLabel.textContent = 'Undetected';
         } else {
           setCappyEmotion(emo);
         }
