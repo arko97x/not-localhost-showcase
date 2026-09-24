@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAPPY // The Makings of a Pervert Detector — Moulik Nanda</title>
+  <meta name="description" content="The complete journey, philosophy, and interactive companion simulator for CAP (Catch a Pervert) & Cappy — an ESP32-S3 tactical media device fighting against smart glasses surveillance. By Moulik Nanda.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       NAVIGATION
+       ========================================================================= -->
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="#hero" class="brand-link">
+        <div class="cappy-logo-mark">
+          <div class="cappy-logo-eyes">
+            <div class="logo-eye"></div>
+            <div class="logo-eye"></div>
+          </div>
+        </div>
+        <div class="brand-meta">
+          <span class="brand-title">CAPPY // CAP</span>
+          <span class="brand-sub">Catch a Pervert</span>
+        </div>
+      </a>
+
+      <ul class="nav-menu">
+        <li><a href="#simulator" class="nav-item-link">Meet Cappy</a></li>
+        <li><a href="#the-problem" class="nav-item-link">The Problem</a></li>
+        <li><a href="#critical-making" class="nav-item-link">Tactical Media</a></li>
+        <li><a href="#making-cappy" class="nav-item-link">The Making</a></li>
+        <li><a href="#the-heist" class="nav-item-link">The Heist &amp; Demo</a></li>
+        <li><a href="#posters" class="nav-item-link">Posters</a></li>
+        <li><a href="#specs" class="nav-item-link">Specs &amp; CLI</a></li>
+      </ul>
+
+      <div class="nav-action-btns">
+        <button id="audioToggleBtn" class="pill-btn active" title="Toggle Haptic Buzzer Sound">
+          <span class="audio-text">Haptics: ON</span>
+        </button>
+        <span class="pill-btn" style="background: var(--bg-card); cursor: default;">
+          <span style="display: inline-block; width: 8px; height: 8px; background: var(--cappy-orange); border-radius: 50%;"></span>
+          <span>CAPPY 2.0</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       HERO & PRESENTATION TITLE SECTION
+       ========================================================================= -->
+  <section class="hero-wrapper" id="hero">
+    <div class="container">
+      <div class="hero-header-banner">
+        <div class="banner-left">
+          <span class="banner-pill">CaP</span>
+          <span>MOULIK NANDA &bull; CATCH A PREDATOR</span>
+        </div>
+        <div class="banner-right">
+          <span>CRITICAL MAKING &bull; TACTICAL MEDIA</span>
+        </div>
+      </div>
+
+      <div class="hero-main-grid">
+        <!-- Story Column -->
+        <div class="hero-story-col">
+          <span class="presentation-title-tag">The Story Behind The Project</span>
+          <h1 class="presentation-hero-title">
+            <span class="orange-highlight">Catch a Predator (CaP)</span>
+          </h1>
+
+          <p class="hero-lead-text">
+            Meet <strong>Cappy</strong>, the pocket companion of <strong>CaP</strong> (short for <em>Catch a Predator</em>). Built with an ESP32-S3, a 1.28&Prime; round LCD, an accelerometer knock detector, and an ERM haptic motor inside a 3D-printed vibrant orange squircle case, Cappy sniffs out nearby Meta Ray-Bans and AR smart glasses in real time.
+          </p>
+
+          <div class="hero-quote-box">
+            <div class="quote-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              The Luddite Stance
+            </div>
+            <div class="quote-body">
+              &ldquo;From being used by perverts to non-consensually record women to glasses sending all recordings back to Meta... we still did not have a hammer for this server room, and my goal was to come up with it.&rdquo;
+            </div>
+          </div>
+
+          <div class="hero-buttons-row">
+            <a href="#simulator" class="btn-chunky">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M8 12s1.5 2 4 2 4-2 4-2"></path>
+              </svg>
+              Interact With Cappy
+            </a>
+            <a href="#the-problem" class="btn-chunky btn-white">
+              Read The Full Journey &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Cappy 2.0 Physical Simulator Stage -->
+        <div class="cappy-interactive-stage" id="simulator">
+          <!-- The Minimal 3D-Printed Orange Squircle Chassis -->
+          <div class="cappy-chassis-squircle" id="cappyChassis" title="Click anywhere on Cappy to knock on him!">
+            <div class="knock-ripple" id="knockRipple"></div>
+
+            <!-- Round LCD Screen Aperture -->
+            <div class="round-screen-aperture">
+              <canvas id="companionCanvas" width="240" height="240"></canvas>
+              <div class="screen-reflection-glass"></div>
+            </div>
+          </div>
+
+          <!-- Telemetry HUD -->
+          <div class="cappy-telemetry-hud">
+            <div class="hud-item">
+              <span class="hud-label">Cappy's Emotion</span>
+              <span id="hudMood" class="hud-val" style="color: var(--cappy-orange);">SAFE (HAPPY)</span>
+            </div>
+            <div class="hud-item">
+              <span class="hud-label">Glasshole Signal</span>
+              <span id="hudRssi" class="hud-val">-100 dBm</span>
+            </div>
+            <div class="hud-item">
+              <span class="hud-label">LovyanGFX Engine</span>
+              <span id="hudFps" class="hud-val">30 FPS</span>
+            </div>
+          </div>
+
+          <!-- Buzzer Indicator -->
+          <div class="haptic-status-chip">
+            <span>MOTOR HAPTIC (GPIO 4):</span>
+            <div id="buzzerLed" class="buzzer-led-dot"></div>
+            <span id="buzzerLabel">STANDBY</span>
+          </div>
+
+          <!-- Controls Deck -->
+          <div class="simulator-control-deck">
+            <div class="control-deck-title">
+              <span>Smart Glasses Proximity (RSSI)</span>
+              <span id="proximityValLabel" style="color: var(--cappy-orange);">-100 dBm (No Glasses / Safe)</span>
+            </div>
+
+            <div class="slider-container-box">
+              <input type="range" id="proximitySlider" class="custom-range-slider" min="-100" max="-35" value="-100" step="1">
+              <div class="slider-labels-row">
+                <span>Safe (-100)</span>
+                <span>Curious (-78)</span>
+                <span>Angry (-73)</span>
+                <span>Rage (-55)</span>
+              </div>
+            </div>
+
+            <div class="control-deck-title" style="margin-top: 14px;">
+              <span>Quick Expressions (From Posters)</span>
+            </div>
+
+            <div class="cappy-action-grid">
+              <button class="cappy-action-btn active" data-emo="DEFAULT">
+                <span>Safe &amp; Sound</span>
+                <span class="sub-text">Rests up when you're safe</span>
+              </button>
+              <button class="cappy-action-btn" data-emo="CURIOUS">
+                <span>Looks Around</span>
+                <span class="sub-text">Scans for pervs (Yellow)</span>
+              </button>
+              <button class="cappy-action-btn" data-emo="ANGRY">
+                <span>Gets Angry</span>
+                <span class="sub-text">Fierce eyes at pervs (Red)</span>
+              </button>
+              <button class="cappy-action-btn" data-emo="RAGE">
+                <span>RAGE MODE</span>
+                <span class="sub-text">Crimson BG + Tremor</span>
+              </button>
+              <button class="cappy-action-btn" data-emo="SLEEPY">
+                <span>Drowsy (30s)</span>
+                <span class="sub-text">Heavy droopy eyelids</span>
+              </button>
+              <button class="cappy-action-btn" data-emo="SLEEPING">
+                <span>Deep Sleep (60s+)</span>
+                <span class="sub-text">Closed slits + Floating Zzz</span>
+              </button>
+              <button class="cappy-action-btn knock-wide-btn" data-emo="KNOCK">
+                <span>Knock on Cappy (ADXL345 Tap)</span>
+                <span style="font-size: 0.68rem; opacity: 0.85;">Wakes him up from sleep groggy with flutter-blinks!</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       CHAPTER 1: A PRELUDE TO THE PROBLEM
+       ========================================================================= -->
+  <section class="story-chapter" id="the-problem">
+    <div class="container">
+      <div class="chapter-badge-row">
+        <span class="chapter-number">01</span>
+        <span class="chapter-tagline">Origin &bull; Orientation Week</span>
+      </div>
+      <h2 class="chapter-heading">A Prelude to the Problem</h2>
+
+      <p class="prose-lead">
+        Right before the start of the studio during orientation week, Vineeta made us participate in an exercise where we had to anticipate where we see ourselves 5 years from now and write a newspaper article in this hypothetical future talking about ourselves. Reading about recent developments in tech, I was disillusioned and pessimistic about what a designer would be working on 5 years down the line that would end up in the news cycle.
+      </p>
+
+      <div class="story-split-grid">
+        <!-- Newspaper Hit Piece Mock -->
+        <div class="newspaper-mock">
+          <div class="newspaper-header">
+            <div class="newspaper-name">Daily News</div>
+            <div class="newspaper-date">21st July 2033 &bull; FUTURE HIT PIECE</div>
+          </div>
+          <div class="newspaper-headline">
+            Young Entrepreneur Unveils Questionable Product: AI and AR Smart Glasses For Cats
+          </div>
+          <div class="newspaper-text">
+            Moulik Nanda, the founder of XYZ LLC, has decided to step into the pet care industry now with a questionable product launch...
+            I feel like the penchant for being overly complex or shifting focus has led to a deprecating problem. Not only does this product hamper the cat's natural hunting instincts, it also impacts their cognition.
+            Another issue that arises with this is privacy. As if putting cameras on everyone's faces wasn't bad enough, putting them on faces of little cats who can unsuspectingly get into anywhere is a major safety issue, especially for women.
+          </div>
+        </div>
+
+        <!-- The Luddite Movement Parallels -->
+        <div class="story-card">
+          <span class="card-stamp stamp-orange">Historical Parallels</span>
+          <h3 class="story-card-title">The Luddite Movement &amp; The Hammer</h3>
+          <p class="story-card-body">
+            Starting this studio by researching the <strong>Luddite movement</strong> and its foundations made me think about recent developments in tech and my speculative article once again.
+          </p>
+          <p class="story-card-body" style="margin-top: 14px;">
+            Further research helped me draw parallels: from smart glasses being used by perverts to <strong>non-consensually record women</strong>, to glasses sending all recordings back to Meta (who employ people in impoverished countries just to look at the recordings and train AI). There were way too many demerits for this product to exist in the first place, let alone be the smartphone replacement that Mark Zuckerberg desperately wants it to be.
+          </p>
+          <div style="margin-top: 20px; font-weight: 700; color: var(--cappy-orange); font-family: var(--font-mono); font-size: 0.88rem;">
+            &ldquo;While public perception has gotten negative, we still did not have a hammer for this server room. My next goal was to come up with it.&rdquo;
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       CHAPTER 2: CRITICAL MAKING & THE 3 HAMMERS
+       ========================================================================= -->
+  <section class="story-chapter" id="critical-making" style="background: var(--bg-card-alt);">
+    <div class="container">
+      <div class="chapter-badge-row">
+        <span class="chapter-number">02</span>
+        <span class="chapter-tagline">Framework &bull; Galloway &amp; Ratto</span>
+      </div>
+      <h2 class="chapter-heading">Critical Making, Protocol &amp; The 3 Hammers</h2>
+
+      <p class="prose-lead">
+        We were introduced to Matt Ratto&rsquo;s paper on <em>Critical Making</em> and Alexander R. Galloway&rsquo;s <em>Protocol</em>. Tactical media introduced me to a brand new form of resistance: <strong>exploiting flaws in the protocol itself to your advantage</strong>. If I open-source this project and share how I made it, it becomes tactical media against big corporations like Meta.
+      </p>
+
+      <div class="hammers-grid">
+        <div class="hammer-card">
+          <span class="hammer-status status-discarded">Idea 01 &bull; Discarded</span>
+          <h3 class="hammer-title">Malicious QR Codes</h3>
+          <p class="hammer-desc">
+            A malicious QR code displayed in public spaces that the smart glasses scan automatically, linking to an audio/video message for the wearer or a payload.
+          </p>
+          <div style="margin-top: auto; padding-top: 14px; font-size: 0.82rem; color: #991b1b; font-family: var(--font-mono);">
+            &times; Patched since Google Glass exploits.
+          </div>
+        </div>
+
+        <div class="hammer-card">
+          <span class="hammer-status status-discarded">Idea 02 &bull; Discarded</span>
+          <h3 class="hammer-title">Anti-AI Adversarial Clothing</h3>
+          <p class="hammer-desc">
+            Clothing designed with repeated motifs, geometric shapes, and contrast arrangements that exploit weaknesses in computer vision systems to fool facial scanning.
+          </p>
+          <div style="margin-top: auto; padding-top: 14px; font-size: 0.82rem; color: #991b1b; font-family: var(--font-mono);">
+            &times; Doesn't stop glassholes recording without consent.
+          </div>
+        </div>
+
+        <div class="hammer-card chosen">
+          <span class="hammer-status status-chosen">Idea 03 &bull; Chosen Hammer!</span>
+          <h3 class="hammer-title">CAP: Catch a Pervert</h3>
+          <p class="hammer-desc">
+            A physical wearable companion that continuously analyses nearby Bluetooth LE signals, extracts 16-bit SIG manufacturer IDs, and alerts the wearer with expressive eyes and haptics when glasses lurk nearby.
+          </p>
+          <div style="margin-top: auto; padding-top: 14px; font-size: 0.82rem; color: var(--cappy-orange); font-family: var(--font-mono); font-weight: 700;">
+            &check; Puts control of privacy back into your hands.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       CHAPTER 3: THE MAKING OF CAPPY
+       ========================================================================= -->
+  <section class="story-chapter" id="making-cappy">
+    <div class="container">
+      <div class="chapter-badge-row">
+        <span class="chapter-number">03</span>
+        <span class="chapter-tagline">Prototyping &bull; From SP Road to Fusion 360</span>
+      </div>
+      <h2 class="chapter-heading">The Making of Cappy</h2>
+
+      <p class="prose-lead">
+        I wanted the product to be as fashionable as it was functional. I took inspiration from a device on my moodboard&mdash;aptly named <code>lilguy.net</code>&mdash;and decided to create a companion creature of my own living inside my product: <strong>Cappy</strong>.
+      </p>
+
+      <div class="timeline-track">
+        <!-- Step 1 -->
+        <div class="timeline-step">
+          <div class="step-marker">01</div>
+          <div class="step-content-card">
+            <div class="step-title-row">
+              <h3 class="step-heading">The SP Road Shopping Spree</h3>
+              <span class="step-date">Bangalore Electronics Market</span>
+            </div>
+            <p class="step-body">
+              I started by doing a shopping spree at SP Road, where I got my first ESP32. After cycling an onboard RGB LED, I tried to write code to detect my Apple Watch by explaining the product to an LLM. My first attempts failed due to my lack of knowledge of modern Bluetooth advertising protocols.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="timeline-step">
+          <div class="step-marker">02</div>
+          <div class="step-content-card">
+            <div class="step-title-row">
+              <h3 class="step-heading">Open-Source Breakthrough: Nearby Glasses</h3>
+              <span class="step-date">GitHub Discovery</span>
+            </div>
+            <p class="step-body">
+              Modern devices don&rsquo;t continuously advertise themselves in simple ways (especially from companies like Meta). I found <strong>Nearby Glasses</strong>, an open-source Android app on GitHub that sniffs BLE advertisements for registered company identifiers. I adapted its logic to my ESP32, mapping RSSI proximity to LED colors and testing it in the real world with my own earphones (Nothing Earbuds).
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="timeline-step">
+          <div class="step-marker">03</div>
+          <div class="step-content-card">
+            <div class="step-title-row">
+              <h3 class="step-heading">Cappy V1 &amp; The Fusion 360 Jumper Wire Jam</h3>
+              <span class="step-date">First 3D Print</span>
+            </div>
+            <p class="step-body">
+              I wanted a squircle with a circular hole in the middle for the 1.28&Prime; round LCD and a hole on the top right for a button. I spent hours learning Fusion 360 on YouTube and measuring parts with measuring tape. Unfortunately, <strong>I forgot to factor in the space that jumper wires take up!</strong> The case couldn't shut, and with no cut-out for the USB port, I had to keep Cappy V1 propped open to use him.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="timeline-step active">
+          <div class="step-marker">04</div>
+          <div class="step-content-card">
+            <div class="step-title-row">
+              <h3 class="step-heading">Cappy 2.0: Bigger, Better, Haptics &amp; Knock Detection</h3>
+              <span class="step-date">Final Srishti Prototype</span>
+            </div>
+            <p class="step-body">
+              After feedback from Manuel to make Cappy more interactive and slightly bigger for better functionality, <strong>Cappy 2.0 was born</strong>.
+            </p>
+            <ul style="margin: 12px 0 0 20px; font-size: 0.92rem; line-height: 1.6;">
+              <li><strong>ADXL345 Accelerometer:</strong> Integrated as a &ldquo;knock detector&rdquo;&mdash;knock on the enclosure while Cappy is asleep to wake him up groggy.</li>
+              <li><strong>Vibration Motor + MOSFET:</strong> Tactile feedback&mdash;a sharp buzz on curious, double buzz on angry, and aggressive triple pulse on rage mode.</li>
+              <li><strong>Redesigned Orange Squircle Case:</strong> Secure snap connection, display support brackets, dedicated USB-C charging slot, and power switch.</li>
+              <li><strong>The Soldering Sagas:</strong> &ldquo;Without support from Nataraju and Sudarsini, I would have fried my ESP32. Do not use superglue as an alternative for solder in emergency situations (long story).&rdquo;</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       CHAPTER 4: THE META GLASSES HEIST & THE LIVE DEMO
+       ========================================================================= -->
+  <section class="story-chapter" id="the-heist" style="background: var(--bg-card-alt);">
+    <div class="container">
+      <div class="chapter-badge-row">
+        <span class="chapter-number">04</span>
+        <span class="chapter-tagline">The Climax &bull; A3 Presentation Day</span>
+      </div>
+      <h2 class="chapter-heading">The Meta Glasses Heist &amp; Live Demo</h2>
+
+      <p class="prose-lead">
+        With Cappy 2.0 ready, there was only one thing left: procuring real Meta glasses for the final A3 demonstration. This became an adventure of its own.
+      </p>
+
+      <div class="story-split-grid">
+        <div class="heist-story-box">
+          <span class="heist-pill-badge">The Heist Saga</span>
+          <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 12px;">Three Bailed Leads &amp; Unreleased Hardware</h3>
+          <p style="font-size: 0.94rem; line-height: 1.6; color: var(--text-body); margin-bottom: 12px;">
+            I reached out to Jayashima, a professor on campus who might have had the glasses, but never heard back. I checked WhatsApp marketplace groups and Reddit:
+          </p>
+          <ul style="margin-left: 20px; font-size: 0.9rem; line-height: 1.6; color: var(--text-body);">
+            <li><strong>Lead 1 (Reddit):</strong> Concerned about lending something expensive to a stranger on Reddit.</li>
+            <li><strong>Lead 2 (JP Nagar):</strong> Disappeared the exact second I mentioned travelling to Yelahanka!</li>
+            <li><strong>Lead 3:</strong> Utilised even shadier methods to procure never-before-seen, unreleased versions of the Meta Ray-Bans for the demonstration!</li>
+          </ul>
+        </div>
+
+        <div class="story-card">
+          <span class="card-stamp stamp-orange">The Final Demo</span>
+          <h3 class="story-card-title">Sudarsini: The &ldquo;Seasoned Pervert&rdquo;</h3>
+          <p class="story-card-body">
+            I structured my presentation so Cappy could speak for himself. A minimal booth with my poster and Cappy on my body.
+          </p>
+          <p class="story-card-body" style="margin-top: 12px;">
+            I demoed CAP in front of the class by calling in my peer <strong>Sudarsini playing the &ldquo;seasoned pervert&rdquo;</strong> wearing the Meta glasses. As she walked closer, Cappy&rsquo;s expressions shifted from curious yellow to angry red, and the vibration motor buzzed in real time! Once the pervert was gone, Cappy dozed off, and I demoed the knock detection to wake him back up.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       CHAPTER 5: POSTERS & ARTIFACTS
+       ========================================================================= -->
+  <section class="story-chapter" id="posters">
+    <div class="container">
+      <div class="chapter-badge-row">
+        <span class="chapter-number">05</span>
+        <span class="chapter-tagline">Visual Identity &bull; Srishti Posters</span>
+      </div>
+      <h2 class="chapter-heading">A2 &amp; A3 Presentation Posters</h2>
+
+      <p class="prose-lead">
+        I wanted the final poster to be minimal on text, while encapsulating Cappy&rsquo;s personality and making sure he stole the limelight of the show.
+      </p>
+
+      <div class="posters-row">
+        <!-- A2 Concept Poster -->
+        <div class="poster-card">
+          <span class="card-stamp stamp-dark">A2 Presentation Poster</span>
+          <div class="poster-frame">
+            <div style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 800; text-transform: uppercase;">
+              A wearable that respects your privacy
+            </div>
+            <div style="display: flex; gap: 12px; margin: 24px 0;">
+              <div class="poster-face-pill" style="background: #ffffff; border-color: #111;">
+                <div class="face-circle-inner"><div class="poster-eye"></div><div class="poster-eye"></div></div>
+              </div>
+              <div class="poster-face-pill" style="background: #ff5722;">
+                <div class="face-circle-inner"><div class="poster-eye"></div><div class="poster-eye"></div></div>
+              </div>
+              <div class="poster-face-pill" style="background: #9c27b0;">
+                <div class="face-circle-inner"><div class="poster-eye"></div><div class="poster-eye"></div></div>
+              </div>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+              Initial colorways &amp; form concept
+            </div>
+          </div>
+        </div>
+
+        <!-- A3 Final Poster -->
+        <div class="poster-card">
+          <span class="card-stamp stamp-orange">A3 Final Poster (The Star)</span>
+          <div class="poster-frame">
+            <span style="font-family: var(--font-mono); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.1em; color: var(--cappy-orange);">MEET</span>
+            <div class="poster-title-pixel">CAPPY</div>
+            <div class="poster-tagline-sub">Your Little Privacy Companion</div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%;">
+              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;">
+                <div class="poster-face-pill" style="width: 58px; height: 58px;">
+                  <div class="face-circle-inner" style="width: 42px; height: 42px;"><div class="poster-eye" style="height: 14px;"></div><div class="poster-eye" style="height: 14px;"></div></div>
+                </div>
+                <span>LOOKS AROUND FOR PERVS</span>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;">
+                <span>GETS ANGRY AT THE PERVS FOR YOU</span>
+                <div class="poster-face-pill" style="width: 58px; height: 58px; background: #e53935;">
+                  <div class="face-circle-inner" style="width: 42px; height: 42px;"><div class="poster-eye" style="height: 14px; transform: rotate(25deg);"></div><div class="poster-eye" style="height: 14px; transform: rotate(-25deg);"></div></div>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;">
+                <div class="poster-face-pill" style="width: 58px; height: 58px; background: #333;">
+                  <div class="face-circle-inner" style="width: 42px; height: 42px;"><div class="poster-eye" style="height: 4px; width: 14px;"></div><div class="poster-eye" style="height: 4px; width: 14px;"></div></div>
+                </div>
+                <span>RESTS UP WHEN YOU'RE SAFE</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px; font-family: var(--font-mono); font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">
+              Reclaim Your Privacy Today
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       CHAPTER 6: TECHNICAL SPECS, DETECTION MATRIX & CLI
+       ========================================================================= -->
+  <section class="story-chapter" id="specs" style="background: var(--bg-card-alt);">
+    <div class="container">
+      <div class="chapter-badge-row">
+        <span class="chapter-number">06</span>
+        <span class="chapter-tagline">Under The Hood &bull; Firmware &amp; CLI</span>
+      </div>
+      <h2 class="chapter-heading">Technical Specifications &amp; Live CLI</h2>
+
+      <p class="prose-lead">
+        Cappy is powered by an ESP32-S3-Zero running dual-core FreeRTOS firmware: Core 0 is dedicated to 100% duty-cycle NimBLE scanning, while Core 1 renders 30 FPS spring-physics graphics via LovyanGFX over 40MHz SPI.
+      </p>
+
+      <div class="specs-split-grid">
+        <!-- Hardware Specs Table -->
+        <div class="specs-table-card">
+          <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 14px;">Cappy 2.0 Bill of Materials</h3>
+          <table class="custom-specs-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Part</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>MCU</strong></td>
+                <td>ESP32-S3-Zero</td>
+                <td>Dual-core BLE &amp; LovyanGFX engine</td>
+              </tr>
+              <tr>
+                <td><strong>Display</strong></td>
+                <td>GC9A01 1.28&Prime; IPS</td>
+                <td>240&times;240 round eyes via 40MHz SPI</td>
+              </tr>
+              <tr>
+                <td><strong>Knock Sensor</strong></td>
+                <td>ADXL345 I&sup2;C</td>
+                <td>Double-tap interrupt on GPIO 3</td>
+              </tr>
+              <tr>
+                <td><strong>Haptic</strong></td>
+                <td>ERM Motor + MOSFET</td>
+                <td>Tactile warnings on GPIO 4</td>
+              </tr>
+              <tr>
+                <td><strong>Power</strong></td>
+                <td>LiPo + TP4056</td>
+                <td>3.7V battery with USB-C recharge</td>
+              </tr>
+              <tr>
+                <td><strong>Case</strong></td>
+                <td>Custom Orange Squircle</td>
+                <td>3D printed with Fusion 360</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top: 18px; padding: 12px; background: #fff0eb; border: 1px solid var(--cappy-orange); border-radius: 6px; font-size: 0.85rem; color: #a12b00; font-family: var(--font-mono);">
+            <strong>PlatformIO:</strong> Compile with <code>pio run</code> &bull; Flash with <code>pio run -t upload</code> &bull; Monitor at 115200 baud.
+          </div>
+        </div>
+
+        <!-- Serial Terminal CLI -->
+        <div class="terminal-block">
+          <div class="terminal-header">
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">ESP32-S3 SERIAL CONSOLE (115200)</span>
+            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: #00e676;">ONLINE</span>
+          </div>
+
+          <div class="terminal-chips-bar">
+            <span style="font-size: 0.7rem; color: #888; display: flex; align-items: center;">Quick Run:</span>
+            <button class="term-chip" data-cmd="rage">rage</button>
+            <button class="term-chip" data-cmd="near">near</button>
+            <button class="term-chip" data-cmd="far">far</button>
+            <button class="term-chip" data-cmd="knock">knock</button>
+            <button class="term-chip" data-cmd="buzz">buzz</button>
+            <button class="term-chip" data-cmd="sleep">sleep</button>
+            <button class="term-chip" data-cmd="status">status</button>
+            <button class="term-chip" data-cmd="clear">clear</button>
+          </div>
+
+          <div id="termScreen" class="term-screen"></div>
+
+          <div class="term-input-line">
+            <span class="term-prompt">esp32-s3 &gt;</span>
+            <input type="text" id="termInput" class="term-input" placeholder="Type 'rage', 'near', 'knock', 'buzz', 'status', 'help'...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Detection Matrix -->
+      <div style="margin-top: 48px;">
+        <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">Bluetooth SIG Vendor Fingerprints</h3>
+        <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 24px;">
+          The hardware signatures that Cappy sniffs out of 2.4 GHz airwaves:
+        </p>
+
+        <div id="detectionCardsGrid" class="story-split-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+          <!-- Rendered dynamically by app.js -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       CHAPTER 7: REFLECTIONS & THE FUTURE
+       ========================================================================= -->
+  <section class="story-chapter" id="reflections">
+    <div class="container">
+      <div class="chapter-badge-row">
+        <span class="chapter-number">07</span>
+        <span class="chapter-tagline">Post-Presentation Observations</span>
+      </div>
+      <h2 class="chapter-heading">Reflections &amp; The Future</h2>
+
+      <p class="prose-lead">
+        Working on CAP and Cappy has been one of the most intensive and transdisciplinary projects I have worked on at Srishti. While I was already aware of how art and politics go hand in hand, the practice of critical making takes the connections even further with the conversations it sparks.
+      </p>
+
+      <div class="story-split-grid">
+        <div class="story-card">
+          <span class="card-stamp stamp-yellow">Feedback &amp; Observations</span>
+          <h3 class="story-card-title">Areas to Iterate Upon</h3>
+          <ul style="margin-left: 20px; font-size: 0.94rem; line-height: 1.6; color: var(--text-body);">
+            <li><strong>Locking &amp; Weight:</strong> Given the size and weight of Cappy, he tended to sag when worn on a shirt, meaning I had to frequently hold him up so the screen faced forward. Future versions need a more robust clip or magnetic mount.</li>
+            <li><strong>Range Calibration:</strong> Depending on the room and background 2.4 GHz noise, detection range varied from &lt;1m to 3.5m. Further RSSI threshold filtering is planned.</li>
+            <li><strong>Wearability:</strong> Cappy works equally well clipped to a waistband for discrete alerts or worn proudly on a shirt for public awareness.</li>
+          </ul>
+        </div>
+
+        <div class="story-card">
+          <span class="card-stamp stamp-orange">Next Steps</span>
+          <h3 class="story-card-title">Towards Capstone &amp; Open Source</h3>
+          <p class="story-card-body">
+            I do not feel like I&rsquo;m done with this project. I have so many ideas waiting to be executed for my capstone next semester: miniaturised custom PCBs, injection-molded modular shells, and full open-source tactical media kits so anyone can assemble their own Cappy and fight back.
+          </p>
+          <div style="margin-top: 18px; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--cappy-orange);">
+            #ReclaimYourPrivacy &bull; #TacticalMedia &bull; #Cappy2.0
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       FOOTER
+       ========================================================================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <div style="font-family: var(--font-mono); font-size: 1.2rem; font-weight: 900; color: var(--text-title);">
+            CAPPY // THE MAKINGS OF A PERVERT DETECTOR
+          </div>
+          <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">
+            A project by <strong>Moulik Nanda</strong> &bull; Srishti Institute of Art, Design &amp; Technology
+          </div>
+        </div>
+        <div style="display: flex; gap: 16px; font-family: var(--font-mono); font-size: 0.82rem;">
+          <a href="#simulator" style="color: var(--text-title); text-decoration: none; font-weight: 700;">&uarr; Back to Cappy</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 Moulik Nanda. Critical Making &bull; Tactical Media against Meta Surveillance.</div>
+        <div>Designed with LovyanGFX &amp; ESP32-S3</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
