@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mirror mirror on the wall</title>
+  <!-- Google Fonts: Cinzel & Spectral -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=13">
+  <!-- MediaPipe Face Mesh & Camera Utils -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Fullscreen Night Sky Starfield & Sunset Liquid Shader Canvas -->
+  <canvas id="particles-canvas"></canvas>
+  <canvas id="sunset-liquid-canvas"></canvas>
+
+  <!-- Vision Camera Pipeline & Visual Debug Telemetry -->
+  <div style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none;" aria-hidden="true">
+    <video id="webcam-video" autoplay playsinline muted style="width: 320px; height: 240px;"></video>
+  </div>
+
+  <!-- Live Gaze Telemetry Visualizer HUD -->
+  <div class="gaze-telemetry-hud" id="gaze-telemetry-hud">
+    <div class="telemetry-header">
+      <span class="telemetry-title">✦ EYE TRACKING TELEMETRY</span>
+      <span class="telemetry-status" id="telemetry-status">INITIALIZING...</span>
+    </div>
+    <div class="telemetry-canvas-wrapper">
+      <canvas id="vision-canvas" width="160" height="120"></canvas>
+    </div>
+    <div class="telemetry-dwell-container">
+      <div class="dwell-bar-wrapper">
+        <span class="dwell-label">LEFT GAZE</span>
+        <div class="dwell-bar-bg"><div class="dwell-bar-fill left" id="dwell-left-fill"></div></div>
+        <span class="dwell-val" id="dwell-left-val">0.0s</span>
+      </div>
+      <div class="dwell-bar-wrapper">
+        <span class="dwell-label">RIGHT GAZE</span>
+        <div class="dwell-bar-bg"><div class="dwell-bar-fill right" id="dwell-right-fill"></div></div>
+        <span class="dwell-val" id="dwell-right-val">0.0s</span>
+      </div>
+    </div>
+    <div class="telemetry-hint">Steer gaze with eyes, head, or ← / → arrow keys</div>
+  </div>
+
+  <div class="screen-container">
+    <!-- Top Bar: Live Time Display -->
+    <header class="top-bar hidden" id="top-bar">
+      <div class="time-display">
+        <span id="live-time" class="time-text">00:00:00</span>
+      </div>
+    </header>
+
+    <!-- Center Content Stages -->
+    <main class="center-content">
+      <!-- 0. Sunset Chrome Lava Lamp Screensaver Stage (Pure visual screensaver on black #000000 background - NO text) -->
+      <div class="screensaver-stage visible" id="screensaver-stage"></div>
+
+      <!-- 1. Instructions Screen Stage (Appears after whirlpool transition - Holds for 12 seconds) -->
+      <div class="floating-mirror-stage hidden" id="instructions-stage">
+        <div class="instruction-body-block">
+          <p class="instruction-body-line">You have come to call on me to see your future.</p>
+          <p class="instruction-body-line">Come inside. Look upon my walls.</p>
+          <p class="instruction-body-line">Then call out, and I shall answer.</p>
+        </div>
+      </div>
+
+      <!-- 2. Voice Call Stage ("mirror mirror on the wall" - Fills up with voice progress) -->
+      <div class="floating-mirror-stage hidden" id="call-stage">
+        <h1 class="voice-fill-title" id="mirror-title">
+          <span class="voice-fill-bg">mirror mirror on the wall</span>
+          <span class="voice-fill-fg" id="voice-fill-fg">mirror mirror on the wall</span>
+        </h1>
+        <p class="voice-hint-sub" id="voice-hint-sub">call out to fill the mirror...</p>
+
+        <div class="listening-wave-indicator" id="listening-indicator">
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+          <span class="wave-bar"></span>
+        </div>
+      </div>
+
+      <!-- 2. Observation Stage: Silent Gaze Tracking in Background -->
+      <div class="gaze-stage hidden" id="gaze-stage">
+        <div class="reading-life-container">
+          <div class="minimal-eye-dot"></div>
+          <p class="reading-life-text" id="reading-life-text">seeing into your life...</p>
+        </div>
+      </div>
+
+      <!-- 3. Prophecy Manifestation Stage (Swiss Ephemeris + Corpus Result) -->
+      <div class="prophecy-stage hidden" id="prophecy-stage">
+        <!-- Astrological Transit Badge -->
+        <div class="transit-badge" id="transit-badge">
+          <span class="transit-glyph" id="transit-glyph">✧</span>
+          <span class="transit-text" id="transit-text">Swiss Ephemeris Transit</span>
+        </div>
+
+        <!-- Prophecy Text -->
+        <div class="prophecy-text-wrapper">
+          <p class="prophecy-quote" id="prophecy-quote"></p>
+        </div>
+
+        <!-- Reflection / System Statement (Revealed 8s after prediction) -->
+        <div class="reflection-stage hidden" id="reflection-stage">
+          <p class="reflection-text">
+            This is a closed little system. The predictions are not instructions from the universe. They are recombination of material that has been allowed inside.
+          </p>
+          <p class="reflection-text">
+            Astrology here is less a claim about certainty than a language for making. This is a closed little system. It does not know the whole world. It has a wall, just like the other language models u use; it cannot see beyond that.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- 4. System Reconfiguration Stage -->
+      <div class="reconfig-stage hidden" id="reconfig-stage">
+        <div class="reconfig-container">
+          <div class="reconfig-astrolabe-ring">
+            <div class="reconfig-inner-dot"></div>
+          </div>
+          <h2 class="reconfig-title">reconfiguring celestial mirror...</h2>
+          <p class="reconfig-subtitle">re-aligning ephemeris telemetry & corpus matrices</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 2000s Retro Popup Dialog Box (Preamble System Statement) -->
+  <div class="retro-popup-overlay hidden" id="retro-popup-overlay">
+    <div class="retro-popup-dialog" id="retro-popup-dialog">
+      <div class="retro-dialog-titlebar">
+        <div class="retro-titlebar-left">
+          <span class="retro-titlebar-icon">🪟</span>
+          <span class="retro-titlebar-text">SYSTEM_PREAMBLE.EXE - System Notice</span>
+        </div>
+        <button class="retro-close-btn" id="retro-close-btn" aria-label="Close">✕</button>
+      </div>
+      <div class="retro-dialog-body">
+        <div class="retro-dialog-warning-icon">⚠️</div>
+        <div class="retro-dialog-content">
+          <p class="retro-preamble-bold">THIS IS A CLOSED LITTLE SYSTEM.</p>
+          <p class="retro-preamble-p">The predictions are not instructions from the universe. They are recombination of material that has been allowed inside.</p>
+          <p class="retro-preamble-p">Astrology here is less a claim about certainty than a language for making. It does not know the whole world. It has a wall, just like the other language models you use; it cannot see beyond that.</p>
+        </div>
+      </div>
+      <div class="retro-dialog-footer">
+        <div class="retro-timer-container">
+          <span class="retro-timer-text" id="retro-timer-text">System reconfiguration in 60s...</span>
+          <div class="retro-timer-bar-bg">
+            <div class="retro-timer-bar-fill" id="retro-timer-fill"></div>
+          </div>
+        </div>
+        <button class="retro-ok-btn" id="retro-ok-btn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="sound_fx.js?v=14"></script>
+  <script src="liquid_sunset.js?v=14"></script>
+  <script src="vision_detector.js?v=14"></script>
+  <script src="particles.js?v=14"></script>
+  <script src="app.js?v=14"></script>
+</body>
+</html>
+
+</body>
+</html>
