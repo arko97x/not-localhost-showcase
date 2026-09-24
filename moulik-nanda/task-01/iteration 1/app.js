@@ -218,6 +218,10 @@
   const audioToggleBtn = document.getElementById('audioToggleBtn');
   const cappyChassis = document.getElementById('cappyChassis');
   const knockRipple = document.getElementById('knockRipple');
+  const glassesToggleBtn = document.getElementById('glassesToggleBtn');
+  let glassesActive = true;
+  let lastActivityTime = performance.now();
+  let sleepTransitionTimeout = null;
 
   // =========================================================================
   // HAPTIC UI INDICATOR
@@ -276,33 +280,62 @@
   }
 
   // =========================================================================
-  // KNOCK DETECTOR (ADXL345 Tap Interrupt)
+  // KNOCK & DOUBLE-TAP DETECTOR (ADXL345 Tap Interrupt)
   // =========================================================================
-  function triggerKnock(source = 'Physical Knock') {
+  function triggerSingleTap(source = 'Chassis Tap') {
     playHapticBuzz('knock');
 
-    // Trigger visual chassis ripple
     if (knockRipple) {
       knockRipple.classList.remove('pulse');
-      void knockRipple.offsetWidth; // re-flow
+      void knockRipple.offsetWidth;
+      knockRipple.classList.add('pulse');
+    }
+
+    const isAsleep = currentEmotion === EMOTIONS.SLEEPING || currentEmotion === EMOTIONS.SLEEPY;
+
+    if (isAsleep) {
+      // Single tap while asleep stirs Cappy but does NOT wake him up!
+      saccadeY = 3.5;
+      setTimeout(() => { saccadeY = 0; }, 160);
+      logSerial(`[ADXL345] Single tap detected (${source}) &mdash; Cappy stirs sleepily. <strong>Double-tap</strong> required to wake him up!`);
+    } else {
+      // Single tap while awake
+      saccadeY = 6;
+      setTimeout(() => { saccadeY = 0; }, 180);
+      lastActivityTime = performance.now();
+      logSerial(`[ADXL345] Single tap detected (${source}) &mdash; Cappy nods hello.`);
+    }
+  }
+
+  function triggerDoubleTap(source = 'Physical Double-Tap') {
+    // Double buzz haptic knock
+    playHapticBuzz('knock');
+    setTimeout(() => { playHapticBuzz('knock'); }, 100);
+
+    if (knockRipple) {
+      knockRipple.classList.remove('pulse');
+      void knockRipple.offsetWidth;
       knockRipple.classList.add('pulse');
     }
 
     const isAsleep = currentEmotion === EMOTIONS.SLEEPING || currentEmotion === EMOTIONS.SLEEPY;
 
     if (!isAsleep) {
-      logSerial(`[Knock] Knock detected (${source}) &mdash; Cappy is already awake!`);
-      // Little responsive eye-nod
-      saccadeY = 7;
-      setTimeout(() => { saccadeY = 0; }, 180);
+      logSerial(`[ADXL345] Double-tap detected (${source}) &mdash; Cappy is already awake!`);
+      saccadeY = 8;
+      setTimeout(() => { saccadeY = -4; }, 110);
+      setTimeout(() => { saccadeY = 0; }, 220);
+      lastActivityTime = performance.now();
       return;
     }
 
     const now = performance.now();
+    clearTimeout(sleepTransitionTimeout);
     dazedStartTime = now;
     dazedEndTime = now + 7500;
+    lastActivityTime = now;
     setCappyEmotion(EMOTIONS.DAZED);
-    logSerial(`[Knock] Knock on Cappy's body! Waking up groggy &rarr; Flutter blinks &amp; searching glance (7.5s)`);
+    logSerial(`[ADXL345] Double-tap confirmed (${source})! Waking up companion &rarr; Flutter blinks &amp; looking around (7.5s)`);
   }
 
   // =========================================================================
@@ -340,11 +373,25 @@
       }
     }
 
-    // Wake up if asleep when glasses detected
-    if ((currentEmotion === EMOTIONS.SLEEPING || currentEmotion === EMOTIONS.SLEEPY) && level > 0) {
+    // If glasses detected nearby (level >= 1), keep Cappy alert and active
+    if (level > 0) {
+      lastActivityTime = performance.now();
+      clearTimeout(sleepTransitionTimeout);
+    }
+
+    const isAsleep = currentEmotion === EMOTIONS.SLEEPING || currentEmotion === EMOTIONS.SLEEPY;
+
+    // If Cappy is asleep and no glasses are detected (level 0), keep sleeping peacefully!
+    if (isAsleep && level === 0) {
+      return;
+    }
+
+    // Wake up if asleep when glasses are detected nearby (level >= 1)
+    if (isAsleep && level > 0) {
       dazedEndTime = 0;
     }
 
+    // While waking up groggy from a knock, maintain groggy wake-up animation unless danger Close up (level 3)
     if (dazedEndTime > performance.now() && level < 3) {
       return;
     }
@@ -402,10 +449,10 @@
     context.lineJoin = 'round';
 
     context.beginPath();
-    context.moveTo(cx - hw, cy + hh);
-    context.lineTo(cx + hw, cy + hh);
-    context.lineTo(cx - hw, cy - hh);
+    context.moveTo(cx - hw, cy - hh);
     context.lineTo(cx + hw, cy - hh);
+    context.lineTo(cx - hw, cy + hh);
+    context.lineTo(cx + hw, cy + hh);
     context.stroke();
 
     context.restore();
@@ -421,9 +468,10 @@
 
       if (p < 0.04) continue;
 
-      const zX = (CX + 20) + p * 38 + Math.sin(p * 5 + i) * 5;
-      const zY = (CY - 12) - p * 64;
-      const size = 8 + i * 4.5;
+      // Trajectory rising upwards from the drooped right eye towards upper-right
+      const zX = (CX + 22) + p * 40 + Math.sin(p * 5 + i) * 5;
+      const zY = (CY + 18) - p * 86;
+      const size = 9 + i * 4.5;
 
       let alpha = 1.0;
       if (p < 0.2) alpha = p / 0.2;
@@ -487,7 +535,24 @@
     } else {
       if (currentEmotion === EMOTIONS.DAZED && dazedEndTime <= now) {
         dazedEndTime = 0;
+        lastActivityTime = now;
         setCappyEmotion(EMOTIONS.DEFAULT);
+      }
+
+      // Automatic Inactivity Sleep Engine (safe & undisturbed: 8s drowsy, 16s deep sleep)
+      if (currentMetricLevel === 0 && dazedEndTime <= now) {
+        const idleMs = now - lastActivityTime;
+        if (idleMs >= 16000) {
+          if (currentEmotion !== EMOTIONS.SLEEPING) {
+            setCappyEmotion(EMOTIONS.SLEEPING);
+            logSerial(`[Idle Engine] Inactivity timeout reached &rarr; Deep Sleep Mode (Zzz). Knock on Cappy's body to wake him up!`);
+          }
+        } else if (idleMs >= 8000) {
+          if (currentEmotion !== EMOTIONS.SLEEPY && currentEmotion !== EMOTIONS.SLEEPING) {
+            setCappyEmotion(EMOTIONS.SLEEPY);
+            logSerial(`[Idle Engine] Safe for 8s &rarr; Cappy is getting drowsy (Sleepy Mode).`);
+          }
+        }
       }
 
       // Organic glances
@@ -677,56 +742,67 @@
 
     switch (cmd) {
       case 'rage':
+      case 'closeup':
+      case 'close-up':
       case 'superclose':
-        if (proximitySlider) proximitySlider.value = -45;
-        updateProximitySignal(-45);
-        if (proximityValLabel) proximityValLabel.textContent = '-45 dBm (Super Close - Rage!)';
-        if (hudRssi) hudRssi.textContent = '-45 dBm';
+        setProximityLevel(3, true);
         break;
 
+      case 'close':
       case 'near':
       case 'angry':
-        if (proximitySlider) proximitySlider.value = -68;
-        updateProximitySignal(-68);
-        if (proximityValLabel) proximityValLabel.textContent = '-68 dBm (Nearby Perv - Angry)';
-        if (hudRssi) hudRssi.textContent = '-68 dBm';
+        setProximityLevel(2, true);
         break;
 
+      case 'detected':
       case 'far':
       case 'curious':
-        if (proximitySlider) proximitySlider.value = -82;
-        updateProximitySignal(-82);
-        if (proximityValLabel) proximityValLabel.textContent = '-82 dBm (Distant Glasses - Curious)';
-        if (hudRssi) hudRssi.textContent = '-82 dBm';
+        setProximityLevel(1, true);
         break;
 
+      case 'undetected':
       case 'none':
+      case 'safe':
       case 'happy':
       case 'default':
-        if (proximitySlider) proximitySlider.value = -100;
-        updateProximitySignal(-100);
-        if (proximityValLabel) proximityValLabel.textContent = '-100 dBm (No Glasses / Safe)';
-        if (hudRssi) hudRssi.textContent = '-100 dBm';
+        setProximityLevel(0, false);
         setCappyEmotion(EMOTIONS.DEFAULT);
         break;
 
       case 'sleepy':
-        if (proximitySlider) proximitySlider.value = -100;
-        updateProximitySignal(-100);
+      case 'drowsy':
         setCappyEmotion(EMOTIONS.SLEEPY);
+        if (proximitySlider) proximitySlider.value = 0;
+        if (proximityValLabel) {
+          proximityValLabel.textContent = 'Undetected';
+          proximityValLabel.style.color = 'var(--text-muted)';
+        }
         break;
 
       case 'sleep':
       case 'sleeping':
-        if (proximitySlider) proximitySlider.value = -100;
-        updateProximitySignal(-100);
         setCappyEmotion(EMOTIONS.SLEEPING);
+        if (proximitySlider) proximitySlider.value = 0;
+        if (proximityValLabel) {
+          proximityValLabel.textContent = 'Undetected';
+          proximityValLabel.style.color = 'var(--text-muted)';
+        }
+        break;
+
+      case 'doubletap':
+      case 'double-tap':
+      case 'wake':
+        triggerDoubleTap('Serial CLI');
         break;
 
       case 'knock':
       case 'tap':
-      case 'doubletap':
-        triggerKnock('Serial CLI');
+        triggerSingleTap('Serial CLI');
+        break;
+
+      case 'glasses':
+      case 'toggle':
+        if (glassesToggleBtn) glassesToggleBtn.click();
         break;
 
       case 'buzz':
@@ -739,7 +815,8 @@
       case 'status':
         logSerial(`----------------- CAPPY STATUS -----------------`);
         logSerial(`Mood: ${currentEmotion}`);
-        logSerial(`Target RSSI: ${rawRssi} dBm (Filtered: ${Math.round(filteredRssi)} dBm)`);
+        logSerial(`Smart Glasses Active: ${glassesActive ? 'YES' : 'NO'}`);
+        logSerial(`Proximity: ${PROXIMITY_METRICS[currentMetricLevel].label} (Level ${currentMetricLevel})`);
         logSerial(`Display: GC9A01 240x240 Round via 40MHz SPI (DMA)`);
         logSerial(`Knock Sensor: ADXL345 at I2C 0x53 (INT1 on GPIO 3)`);
         logSerial(`BLE Sentinel: NimBLE on Core 0 (100% duty cycle)`);
@@ -752,7 +829,7 @@
         break;
 
       case 'help':
-        logSerial(`Commands: rage, near, far, none, sleepy, sleep, knock, buzz, status, clear`);
+        logSerial(`Commands: rage, close, detected, undetected, safe, sleepy, sleep, knock, glasses, buzz, status, clear`);
         break;
 
       default:
@@ -884,33 +961,87 @@
     renderDetectionCards(DETECTION_DATA);
     requestAnimationFrame(renderLoop);
 
-    // 2. Chassis Click -> Knock Detection
+    // 2. Chassis Click & Tap -> Double-Tap Wake-up Interaction
     if (cappyChassis) {
-      let clickCount = 0;
-      let clickTimer = null;
-      cappyChassis.addEventListener('click', () => {
+      let lastTapTimestamp = 0;
+
+      const handleChassisTap = (e) => {
+        e.stopPropagation();
         initAudio();
-        clickCount++;
-        if (clickCount === 1) {
-          clickTimer = setTimeout(() => {
-            // Single tap on chassis
-            triggerKnock('Single Tap');
-            clickCount = 0;
-          }, 320);
-        } else if (clickCount >= 2) {
-          clearTimeout(clickTimer);
-          clickCount = 0;
-          triggerKnock('Double Knock');
+        const now = performance.now();
+        const elapsed = now - lastTapTimestamp;
+        lastTapTimestamp = now;
+
+        // Double-tap threshold: between 60ms and 480ms
+        if (elapsed > 60 && elapsed < 480) {
+          lastTapTimestamp = 0; // consume double-tap
+          triggerDoubleTap('Chassis Tap-Tap');
+        } else {
+          triggerSingleTap('Chassis Tap');
+        }
+      };
+
+      cappyChassis.addEventListener('click', handleChassisTap);
+      if (canvas) {
+        canvas.addEventListener('click', handleChassisTap);
+      }
+    }
+
+    // 3. Smart Glasses Toggle Button (Top-Left)
+    if (glassesToggleBtn) {
+      glassesToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        initAudio();
+        glassesActive = !glassesActive;
+        document.body.classList.toggle('glasses-on', glassesActive);
+        glassesToggleBtn.classList.toggle('active', glassesActive);
+        const textSpan = glassesToggleBtn.querySelector('.glasses-toggle-text');
+        if (textSpan) {
+          textSpan.textContent = glassesActive ? 'Glasses: ON' : 'Glasses: OFF';
+        }
+
+        clearTimeout(sleepTransitionTimeout);
+
+        if (!glassesActive) {
+          // Reset proximity when smart glasses are turned off
+          currentMetricLevel = 0;
+          if (proximitySlider) proximitySlider.value = 0;
+          if (proximityValLabel) {
+            proximityValLabel.textContent = 'Undetected';
+            proximityValLabel.style.color = 'var(--text-muted)';
+          }
+
+          logSerial(`[BLE] Smart glasses toggled OFF &mdash; radio silence, no targets in range.`);
+          logSerial(`[Cappy] No glasses detected. Drooping into Sleep Mode...`);
+
+          // 1. Immediately droop eyes into sleepy mode
+          setCappyEmotion(EMOTIONS.SLEEPY);
+
+          // 2. After 1.2s, close eyes into deep sleep with Zzz
+          sleepTransitionTimeout = setTimeout(() => {
+            if (!glassesActive) {
+              lastActivityTime = performance.now() - 25000;
+              setCappyEmotion(EMOTIONS.SLEEPING);
+              logSerial(`[Cappy] Deep Sleep Mode activated (Zzz)! Tap or knock on Cappy's orange chassis to wake him up.`);
+            }
+          }, 1200);
+        } else {
+          // Glasses turned back ON
+          lastActivityTime = performance.now();
+          setCappyEmotion(EMOTIONS.DEFAULT);
+          logSerial(`[BLE] Smart glasses toggled ON &mdash; BLE radio active, sniffing Meta frames.`);
+          playHapticBuzz('single');
         }
       });
     }
 
-    // 3. Mouse cursor proximity tracking (Glasses cursor approaching Cappy)
+    // 4. Mouse cursor proximity tracking (Only active when glasses are ON)
     let isUserDraggingSlider = false;
     let lastMouseMoveTime = 0;
 
     window.addEventListener('mousemove', (e) => {
-      if (!cappyChassis || isUserDraggingSlider) return;
+      // If smart glasses are toggled OFF, or manual slider being dragged, ignore mouse proximity
+      if (!cappyChassis || !glassesActive || isUserDraggingSlider) return;
 
       const now = performance.now();
       if (now - lastMouseMoveTime < 25) return; // ~40fps smooth throttle
@@ -945,12 +1076,12 @@
     });
 
     document.addEventListener('mouseleave', () => {
-      if (!isUserDraggingSlider) {
+      if (!isUserDraggingSlider && glassesActive) {
         setProximityLevel(0, false);
       }
     });
 
-    // 4. Proximity Slider
+    // 5. Proximity Slider
     if (proximitySlider) {
       proximitySlider.addEventListener('mousedown', () => { isUserDraggingSlider = true; });
       proximitySlider.addEventListener('touchstart', () => { isUserDraggingSlider = true; }, { passive: true });
@@ -964,27 +1095,49 @@
       });
     }
 
-    // 5. Cappy Quick Emotion Buttons
+    // 6. Cappy Quick Emotion Buttons
     document.querySelectorAll('.mood-btn, .cappy-action-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         initAudio();
         const emo = btn.dataset.emo;
+        clearTimeout(sleepTransitionTimeout);
+
         if (emo === 'KNOCK') {
           triggerKnock('Control Button');
         } else if (emo === 'DEFAULT') {
+          lastActivityTime = performance.now();
           setProximityLevel(0, false);
+          setCappyEmotion(EMOTIONS.DEFAULT);
         } else if (emo === 'CURIOUS') {
+          lastActivityTime = performance.now();
           setProximityLevel(1, true);
         } else if (emo === 'ANGRY') {
+          lastActivityTime = performance.now();
           setProximityLevel(2, true);
         } else if (emo === 'RAGE') {
+          lastActivityTime = performance.now();
           setProximityLevel(3, true);
-        } else if (emo === 'SLEEPY' || emo === 'SLEEPING') {
-          setCappyEmotion(emo);
+        } else if (emo === 'SLEEPY') {
+          dazedEndTime = 0;
+          lastActivityTime = performance.now() - 9000;
+          setCappyEmotion(EMOTIONS.SLEEPY);
           if (proximitySlider) proximitySlider.value = 0;
-          if (proximityValLabel) proximityValLabel.textContent = 'Undetected';
+          if (proximityValLabel) {
+            proximityValLabel.textContent = 'Undetected';
+            proximityValLabel.style.color = 'var(--text-muted)';
+          }
+        } else if (emo === 'SLEEPING') {
+          dazedEndTime = 0;
+          lastActivityTime = performance.now() - 25000;
+          setCappyEmotion(EMOTIONS.SLEEPING);
+          if (proximitySlider) proximitySlider.value = 0;
+          if (proximityValLabel) {
+            proximityValLabel.textContent = 'Undetected';
+            proximityValLabel.style.color = 'var(--text-muted)';
+          }
         } else {
+          lastActivityTime = performance.now();
           setCappyEmotion(emo);
         }
       });

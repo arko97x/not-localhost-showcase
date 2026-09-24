@@ -8,27 +8,33 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
-<body>
+<body class="glasses-on">
 
   <!-- =========================================================================
        HEADER
        ========================================================================= -->
   <header class="site-header">
     <div class="container nav-wrap">
-      <a href="#" class="brand-link">
-        <div class="cappy-logo-mark">
-          <div class="cappy-logo-eyes">
-            <div class="logo-eye"></div>
-            <div class="logo-eye"></div>
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <button id="glassesToggleBtn" class="pill-btn glasses-btn active" title="Toggle Smart Glasses (ON/OFF)">
+          <span>🕶️</span>
+          <span class="glasses-toggle-text">Glasses: ON</span>
+        </button>
+        <a href="#" class="brand-link">
+          <div class="cappy-logo-mark">
+            <div class="cappy-logo-eyes">
+              <div class="logo-eye"></div>
+              <div class="logo-eye"></div>
+            </div>
           </div>
-        </div>
-        <div class="brand-meta">
-          <span class="brand-title">CAPPY // CaP</span>
-          <span class="brand-sub">Catch a Predator</span>
-        </div>
-      </a>
+          <div class="brand-meta">
+            <span class="brand-title">CAPPY // CaP</span>
+            <span class="brand-sub">Catch a Predator</span>
+          </div>
+        </a>
+      </div>
 
       <div style="display: flex; align-items: center; gap: 10px;">
         <button id="audioToggleBtn" class="pill-btn active" title="Toggle Haptic Buzzer Sound">
@@ -68,13 +74,15 @@
 
       <!-- Right: Interactive Cappy Chassis -->
       <div class="cappy-stage">
-        <div class="cappy-squircle" id="cappyChassis" title="Click Cappy to knock on him!">
+        <div class="cappy-squircle" id="cappyChassis" title="Double-tap Cappy's body to wake him up!">
           <div class="knock-ripple" id="knockRipple"></div>
           <div class="round-screen">
             <canvas id="companionCanvas" width="240" height="240"></canvas>
             <div class="screen-glass"></div>
           </div>
         </div>
+
+        <p class="knock-hint">👋 Double-tap on Cappy&rsquo;s body to wake him up</p>
 
         <!-- Compact Controls -->
         <div class="sim-controls">
@@ -98,7 +106,6 @@
             <button class="mood-btn" data-emo="RAGE">Close up</button>
             <button class="mood-btn" data-emo="SLEEPY">Drowsy</button>
             <button class="mood-btn" data-emo="SLEEPING">Sleep</button>
-            <button class="mood-btn knock-btn-full" data-emo="KNOCK">Knock on Cappy (Wake Up)</button>
           </div>
         </div>
       </div>
@@ -226,6 +233,6 @@
     </div>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

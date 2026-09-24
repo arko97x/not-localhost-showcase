@@ -44,8 +44,20 @@ html {
 }
 
 /* Custom Sunglasses Cursor (Smart Glasses with Meta Camera indicator) */
-html, body, a, button, input, select, textarea, div, span, canvas {
+body.glasses-on,
+body.glasses-on a,
+body.glasses-on button,
+body.glasses-on input,
+body.glasses-on select,
+body.glasses-on textarea,
+body.glasses-on div,
+body.glasses-on span,
+body.glasses-on canvas {
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'><path d='M2 3.5 C2 2 3.5 1 5 1 L35 1 C36.5 1 38 2 38 3.5 L39 7.5 C39 13.5 34 18 28.5 18 C23 18 21.5 14 20 14 C18.5 14 17 18 11.5 18 C6 18 1 13.5 1 7.5 Z' fill='%23111215' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/><path d='M4.5 4.5 C4.5 3 6.5 3 10 3 C13.5 3 17 3 18 4.5 C18 9 16.5 15.5 12 15.5 C7.5 15.5 4.5 12 4.5 4.5 Z' fill='%231f242d' stroke='%2338404d' stroke-width='1'/><path d='M22 4.5 C23 3 26.5 3 30 3 C33.5 3 35.5 3 35.5 4.5 C35.5 12 32.5 15.5 28 15.5 C23.5 15.5 22 9 22 4.5 Z' fill='%231f242d' stroke='%2338404d' stroke-width='1'/><path d='M6 5 L14 5 C13 9 10 13 8 13 Z' fill='%23ffffff' opacity='0.22'/><path d='M24 5 L32 5 C31 9 28 13 26 13 Z' fill='%23ffffff' opacity='0.22'/><circle cx='3.5' cy='4' r='1.5' fill='%2300e5ff' stroke='%23111' stroke-width='0.5'/><circle cx='36.5' cy='4' r='1.5' fill='%23ffffff' stroke='%23111' stroke-width='0.5'/></svg>") 20 10, crosshair !important;
+}
+
+.cappy-squircle {
+  cursor: pointer !important;
 }
 
 body {
@@ -165,14 +177,22 @@ body {
   transition: all 0.1s ease;
 }
 
-.pill-btn:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0 var(--border-strong);
-}
-
 .pill-btn.active {
   background: var(--cappy-orange);
   color: #fff;
+}
+
+.glasses-btn {
+  background: #ffffff;
+  color: var(--text-title);
+  border: 2px solid var(--border-strong);
+}
+
+.glasses-btn.active {
+  background: #111215 !important;
+  color: #ffffff !important;
+  border-color: #111215 !important;
+  box-shadow: 2px 2px 0 var(--cappy-orange) !important;
 }
 
 /* ==========================================================================
@@ -266,6 +286,17 @@ body {
 
 .cappy-squircle:active {
   transform: scale(0.985);
+}
+
+.knock-hint {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-top: 10px;
+  margin-bottom: 2px;
+  text-align: center;
+  letter-spacing: 0.02em;
 }
 
 .knock-ripple {
