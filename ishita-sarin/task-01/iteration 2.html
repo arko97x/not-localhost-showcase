@@ -1,0 +1,670 @@
+<title>Incubation Café</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --paper: #eff2ea;
+    --paper-raised: #e5e9dd;
+    --ink: #131a13;
+    --ink-soft: #4a534a;
+    --line: rgba(19,26,19,0.14);
+    --lime: #7fd13a;
+    --lime-strong: #5fae21;
+    --amber: #c9822f;
+    --teal: #2f8f82;
+    --card-bg: #f7f8f2;
+    --shadow: 0 1px 0 rgba(19,26,19,0.06);
+    --focus: #131a13;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper: #10140d;
+      --paper-raised: #171d13;
+      --ink: #eef1e6;
+      --ink-soft: #a9b2a1;
+      --line: rgba(238,241,230,0.14);
+      --lime: #a8ea63;
+      --lime-strong: #c3fa8c;
+      --amber: #e3a35a;
+      --teal: #4fb3a5;
+      --card-bg: #151b10;
+      --shadow: 0 1px 0 rgba(0,0,0,0.4);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper: #10140d;
+    --paper-raised: #171d13;
+    --ink: #eef1e6;
+    --ink-soft: #a9b2a1;
+    --line: rgba(238,241,230,0.14);
+    --lime: #a8ea63;
+    --lime-strong: #c3fa8c;
+    --amber: #e3a35a;
+    --teal: #4fb3a5;
+    --card-bg: #151b10;
+    --shadow: 0 1px 0 rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    padding-inline: 0;
+    overflow-x: hidden;
+  }
+  h1,h2,h3{
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    text-wrap: balance;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  p{ margin: 0; }
+  a{ color: inherit; }
+  .mono{ font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  ::selection{ background: var(--lime); color: #0d1509; }
+
+  .wrap{ max-width: 1180px; margin-inline: auto; padding-inline: clamp(18px, 4vw, 48px); }
+
+  /* ---------- nav ---------- */
+  .nav{
+    position: sticky; top: env(safe-area-inset-top, 0px);
+    z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    padding: 14px clamp(18px, 4vw, 48px);
+    background: color-mix(in srgb, var(--paper) 86%, transparent);
+    backdrop-filter: blur(10px) saturate(1.1);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand{ display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+  .brand .mark{
+    width: 22px; height: 22px; border-radius: 999px;
+    background: conic-gradient(from 200deg, var(--lime), var(--teal), var(--lime));
+    flex: none;
+  }
+  .navlinks{ display: flex; gap: 22px; font-size: 13.5px; }
+  .navlinks a{ text-decoration: none; color: var(--ink-soft); transition: color .15s ease; }
+  .navlinks a:hover, .navlinks a:focus-visible{ color: var(--ink); }
+  .navlinks .batch{
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-soft);
+    border: 1px solid var(--line); padding: 4px 9px; border-radius: 999px;
+  }
+  @media (max-width: 640px){ .navlinks span.hide-sm{ display:none; } }
+
+  /* ---------- hero ---------- */
+  .hero{ position: relative; padding: clamp(56px, 10vw, 108px) 0 clamp(40px, 7vw, 72px); overflow: hidden; }
+  .hero canvas{ position: absolute; inset: 0; width: 100%; height: 100%; opacity: .55; pointer-events: none; }
+  .hero-inner{ position: relative; z-index: 1; }
+  .eyebrow{
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--ink-soft); border: 1px solid var(--line); padding: 6px 12px; border-radius: 999px;
+    background: var(--card-bg);
+    margin-bottom: 22px;
+  }
+  .eyebrow .dot{ width: 6px; height: 6px; border-radius: 999px; background: var(--lime); box-shadow: 0 0 0 3px color-mix(in srgb, var(--lime) 25%, transparent); }
+  .hero h1{
+    font-size: clamp(38px, 6.4vw, 78px); line-height: .98;
+    max-width: 15ch;
+  }
+  .hero h1 em{ font-style: italic; color: var(--lime-strong); }
+  .hero-sub{
+    display: flex; gap: clamp(24px, 6vw, 64px); flex-wrap: wrap;
+    margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--line);
+  }
+  .hero-copy{ max-width: 46ch; font-size: 16px; line-height: 1.55; color: var(--ink-soft); }
+  .hero-stats{ display: flex; gap: clamp(20px, 4vw, 40px); }
+  .stat{ min-width: 76px; }
+  .stat .num{ font-family: 'Fraunces', serif; font-size: clamp(30px, 4vw, 42px); font-weight: 600; line-height: 1; color: var(--lime-strong); }
+  .stat .lbl{ font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; margin-top: 6px; }
+
+  /* ---------- about ---------- */
+  .about{ padding: clamp(48px, 8vw, 84px) 0; border-top: 1px solid var(--line); }
+  .about-grid{ display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); gap: clamp(28px, 6vw, 72px); align-items: start; }
+  @media (max-width: 780px){ .about-grid{ grid-template-columns: 1fr; } }
+  .section-label{
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--lime-strong); margin-bottom: 14px; display:block;
+  }
+  .about h2{ font-size: clamp(26px, 3.4vw, 36px); margin-bottom: 18px; }
+  .about p{ color: var(--ink-soft); line-height: 1.6; font-size: 15.5px; }
+  .about p + p{ margin-top: 14px; }
+  .steps{ display: flex; flex-direction: column; gap: 0; }
+  .step{ display: flex; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); }
+  .step:last-child{ border-bottom: 1px solid var(--line); }
+  .step .n{ font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-soft); padding-top: 2px; flex: none; width: 24px; }
+  .step .t{ font-weight: 600; font-size: 14.5px; margin-bottom: 4px; }
+  .step .d{ font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+
+  /* ---------- glossary ---------- */
+  .glossary{ padding: clamp(40px, 7vw, 68px) 0; border-top: 1px solid var(--line); }
+  .glossary h2{ font-size: clamp(24px, 3.2vw, 32px); margin-bottom: 6px; }
+  .glossary > .wrap > p.lead{ color: var(--ink-soft); font-size: 15px; max-width: 60ch; margin-bottom: 30px; }
+  .gloss-group{ margin-bottom: 30px; }
+  .gloss-group:last-child{ margin-bottom: 0; }
+  .gloss-group-title{ font-size: 13px; font-weight: 600; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 14px; }
+  .gloss-list{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .gloss-list.gloss-tags{ grid-template-columns: repeat(5, 1fr); }
+  @media (max-width: 900px){ .gloss-list, .gloss-list.gloss-tags{ grid-template-columns: repeat(2, 1fr); } }
+  .gloss-item{ background: var(--card-bg); border: 1px solid var(--line); border-radius: 12px; padding: 14px 15px; }
+  .gloss-item .stage, .gloss-item .tag-pill{ margin-bottom: 9px; display: inline-block; }
+  .tag-pill{
+    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em;
+    padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ink-soft) 16%, transparent); color: var(--ink);
+  }
+  .gloss-item p{ font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+
+  /* ---------- cohort ---------- */
+  .cohort{ padding: clamp(48px, 8vw, 84px) 0 clamp(30px,6vw,56px); border-top: 1px solid var(--line); }
+  .cohort-head{ display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 28px; }
+  .cohort-head h2{ font-size: clamp(26px, 3.4vw, 36px); }
+  .filters{ display: flex; gap: 8px; flex-wrap: wrap; }
+  .filters button{
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .02em;
+    background: var(--card-bg); border: 1px solid var(--line); color: var(--ink-soft);
+    padding: 7px 13px; border-radius: 999px; cursor: pointer; transition: all .15s ease;
+  }
+  .filters button:hover{ color: var(--ink); border-color: var(--ink-soft); }
+  .filters button[aria-pressed="true"]{ background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .grid{
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  @media (max-width: 900px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px){ .grid{ grid-template-columns: 1fr; } }
+
+  .card{
+    background: var(--card-bg); border: 1px solid var(--line); border-radius: 14px;
+    padding: 18px; cursor: pointer; text-align: left;
+    display: flex; flex-direction: column; gap: 14px;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    opacity: 0; transform: translateY(14px);
+    animation: rise .5s ease forwards;
+    font: inherit; color: inherit;
+  }
+  .card:hover{ transform: translateY(-3px); border-color: var(--ink-soft); box-shadow: 0 10px 24px -14px rgba(0,0,0,.28); }
+  .card:focus-visible{ outline: 2px solid var(--focus); outline-offset: 2px; }
+  @keyframes rise{ to{ opacity: 1; transform: translateY(0); } }
+  .card.hidden-item{ display: none; }
+
+  .card-top{ display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .card-id{ font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink-soft); }
+  .stage{
+    font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em;
+    padding: 3px 8px; border-radius: 999px; white-space: nowrap;
+  }
+  .stage-grounds{ background: color-mix(in srgb, var(--ink-soft) 18%, transparent); color: var(--ink-soft); }
+  .stage-brewing{ background: color-mix(in srgb, var(--amber) 20%, transparent); color: var(--amber); }
+  .stage-steeping{ background: color-mix(in srgb, var(--teal) 20%, transparent); color: var(--teal); }
+  .stage-poured{ background: color-mix(in srgb, var(--lime-strong) 24%, transparent); color: var(--lime-strong); }
+
+  .card canvas.blob{ width: 100%; height: 88px; display: block; border-radius: 8px; background: var(--paper-raised); }
+  .card h3{ font-size: 17px; }
+  .card .tag{ font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; }
+  .card .blurb{ font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; }
+
+  .empty-msg{ grid-column: 1/-1; text-align: center; padding: 40px 0; color: var(--ink-soft); font-size: 14px; display:none; }
+
+  /* ---------- modal ---------- */
+  .modal-backdrop{
+    position: fixed; inset: 0; background: color-mix(in srgb, var(--ink) 45%, transparent);
+    display: flex; align-items: flex-end; justify-content: center;
+    z-index: 100; opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    padding: 0;
+  }
+  @media (min-width: 640px){ .modal-backdrop{ align-items: center; padding: 24px; } }
+  .modal-backdrop.open{ opacity: 1; pointer-events: auto; }
+  .modal{
+    background: var(--paper); border: 1px solid var(--line);
+    width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto;
+    border-radius: 18px 18px 0 0;
+    padding: 26px clamp(20px,4vw,32px) calc(30px + env(safe-area-inset-bottom, 0px));
+    transform: translateY(24px); transition: transform .22s ease;
+  }
+  @media (min-width: 640px){ .modal{ border-radius: 18px; transform: translateY(10px); } }
+  .modal-backdrop.open .modal{ transform: translateY(0); }
+  .modal-top{ display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+  .modal canvas.blob{ width: 100%; height: 140px; border-radius: 10px; background: var(--paper-raised); margin-bottom: 18px; }
+  .modal h3{ font-size: 24px; margin-bottom: 6px; }
+  .modal-meta{ display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+  .modal-close{
+    background: var(--card-bg); border: 1px solid var(--line); border-radius: 999px;
+    width: 32px; height: 32px; flex: none; cursor: pointer; color: var(--ink);
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .modal-close:hover{ border-color: var(--ink-soft); }
+  .modal-desc{ font-size: 15px; line-height: 1.6; color: var(--ink-soft); margin-top: 14px; }
+  .modal-note{
+    margin-top: 20px; padding: 12px 14px; border-radius: 10px; background: var(--card-bg);
+    border: 1px dashed var(--line); font-size: 12.5px; color: var(--ink-soft); line-height: 1.5;
+  }
+
+  /* ---------- footer ---------- */
+  footer{ border-top: 1px solid var(--line); padding: 34px 0 calc(34px + env(safe-area-inset-bottom, 0px)); }
+  .foot-row{ display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--ink-soft); }
+  .foot-row .mono{ font-size: 12px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+
+<nav class="nav">
+  <div class="brand"><span class="mark"></span>Incubation Café</div>
+  <div class="navlinks">
+    <a href="#cohort">Cohort</a>
+    <a href="#glossary" class="hide-sm">Glossary</a>
+    <a href="#about" class="hide-sm">About</a>
+    <span class="batch mono">MDes · Yr 2</span>
+  </div>
+</nav>
+
+<section class="hero" id="top">
+  <canvas id="brewCanvas" aria-hidden="true"></canvas>
+  <div class="wrap hero-inner">
+    <span class="eyebrow"><span class="dot"></span>Batch currently brewing</span>
+    <h1>Fifteen ideas,<br>still <em>steeping</em>.</h1>
+    <div class="hero-sub">
+      <p class="hero-copy">The second-year MDes cohort's work-in-progress showcase, run out of Incubation Café — the studio's standing space for half-finished thinking, shared early and often. What's below is a placeholder cast: real names and projects move in as the batch matures.</p>
+      <div class="hero-stats">
+        <div class="stat"><div class="num" id="countStat">0</div><div class="lbl">Designers</div></div>
+        <div class="stat"><div class="num">1</div><div class="lbl">Studio</div></div>
+        <div class="stat"><div class="num">10wk</div><div class="lbl">Brew cycle</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <span class="section-label">The premise</span>
+      <h2>Why a café, and why incubation.</h2>
+      <p>Incubation Café is a 10-week module inside the second-year MDes studio: a running bench where ideas get poured out early, tasted while they're rough, and sent back for another round. It sits between a brief and a finished thesis project — the part usually kept private.</p>
+      <p>This site is that bench made public. Fifteen designers, fifteen concurrent projects, each logged at whatever stage it happens to be in — grounds, brewing, steeping, or freshly poured. Nothing here is final, and that's the point: it's a record of work being made, not work that's done.</p>
+    </div>
+    <div>
+      <span class="section-label">How to read a card</span>
+      <div class="steps">
+        <div class="step"><span class="n mono">01</span><div><div class="t">Pick a specimen</div><div class="d">Every card below stands in for one designer's project — placeholder name and description for now, swapped for the real thing closer to Demo Day.</div></div></div>
+        <div class="step"><span class="n mono">02</span><div><div class="t">Check the brew stage</div><div class="d">The pill on each card marks how far along the work is, from first grounds to a fully poured cup — see the <a href="#glossary" style="text-decoration:underline;">glossary below</a> for what each stage means.</div></div></div>
+        <div class="step"><span class="n mono">03</span><div><div class="t">Open it up</div><div class="d">Click through for the one-line pitch, the discipline it sits in, and a note on what's next.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="glossary" id="glossary">
+  <div class="wrap">
+    <span class="section-label">Reading the labels</span>
+    <h2>What the tags on each card mean.</h2>
+    <p class="lead">Every card carries two labels: a brew stage (how far along the project is) and a discipline (what kind of design problem it is). Here's what each one means.</p>
+
+    <div class="gloss-group">
+      <div class="gloss-group-title">Brew stage — how far along</div>
+      <div class="gloss-list">
+        <div class="gloss-item"><span class="stage stage-grounds">Grounds</span><p>Just started. The problem is picked, but there's no direction yet — still figuring out what to even design.</p></div>
+        <div class="gloss-item"><span class="stage stage-brewing">Brewing</span><p>Concepting. Several directions are being sketched and tested; nothing is locked in.</p></div>
+        <div class="gloss-item"><span class="stage stage-steeping">Steeping</span><p>Refining. One direction has been chosen and is being pressure-tested and reworked.</p></div>
+        <div class="gloss-item"><span class="stage stage-poured">Poured</span><p>Presentable. There's a working prototype or draft, ready to show and get real feedback on.</p></div>
+      </div>
+    </div>
+
+    <div class="gloss-group">
+      <div class="gloss-group-title">Discipline — what kind of project</div>
+      <div class="gloss-list gloss-tags">
+        <div class="gloss-item"><span class="tag-pill">Product</span><p>A physical or digital object someone would use or own.</p></div>
+        <div class="gloss-item"><span class="tag-pill">Service</span><p>A process or system of interactions across people, touchpoints and time.</p></div>
+        <div class="gloss-item"><span class="tag-pill">Research</span><p>A study into a behaviour, group or problem — understanding, not yet solving.</p></div>
+        <div class="gloss-item"><span class="tag-pill">Interaction</span><p>How a person and a system communicate — gesture, sound, touch, interface.</p></div>
+        <div class="gloss-item"><span class="tag-pill">Systems</span><p>A framework, toolkit or shared language used across a larger structure.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cohort" id="cohort">
+  <div class="wrap">
+    <div class="cohort-head">
+      <div>
+        <span class="section-label">The batch</span>
+        <h2>Fifteen designers, one bench.</h2>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="Filter by discipline"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="empty-msg" id="emptyMsg">No projects in this stage yet — check back as the batch brews.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-row">
+    <span>Incubation Café — MDes Year 2 cohort showcase.</span>
+    <span class="mono">Names &amp; projects are placeholders, pending the real batch.</span>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalName">
+    <div class="modal-top">
+      <div>
+        <span class="mono" id="modalId" style="color:var(--ink-soft);font-size:11.5px;"></span>
+        <h3 id="modalName"></h3>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    </div>
+    <canvas class="blob" id="modalBlob"></canvas>
+    <div class="modal-meta">
+      <span class="tag mono" id="modalTag" style="color:var(--ink-soft);"></span>
+      <span class="stage" id="modalStage"></span>
+    </div>
+    <p class="modal-desc" id="modalDesc"></p>
+    <div class="modal-note">Placeholder entry — this designer's real name, project title and image will replace this text before launch.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var STAGES = ['grounds','brewing','steeping','poured'];
+  var STAGE_LABEL = { grounds: 'Grounds', brewing: 'Brewing', steeping: 'Steeping', poured: 'Poured' };
+
+  var projects = [
+    { id:1, name:'Person A', tag:'Product', stage:'poured', blurb:'A modular kit that turns e-waste into working desk lamps.' },
+    { id:2, name:'Person B', tag:'Service', stage:'steeping', blurb:'Redesigning the queue at neighbourhood ration shops.' },
+    { id:3, name:'Person C', tag:'Research', stage:'brewing', blurb:'Mapping how elderly users actually navigate UPI apps.' },
+    { id:4, name:'Person D', tag:'Interaction', stage:'grounds', blurb:'A tactile interface for reading Braille through vibration.' },
+    { id:5, name:'Person E', tag:'Systems', stage:'brewing', blurb:'A visual language for tracking water use across a housing colony.' },
+    { id:6, name:'Person F', tag:'Product', stage:'steeping', blurb:'Foldable furniture built for 200 sq. ft. student rooms.' },
+    { id:7, name:'Person G', tag:'Service', stage:'grounds', blurb:'Rethinking the last mile of hospital discharge.' },
+    { id:8, name:'Person H', tag:'Research', stage:'poured', blurb:'Why gig workers distrust rating systems, and what changes that.' },
+    { id:9, name:'Person I', tag:'Interaction', stage:'brewing', blurb:'A sound-based interface for night-shift factory workers.' },
+    { id:10, name:'Person J', tag:'Systems', stage:'steeping', blurb:'A toolkit for co-operative societies to self-audit finances.' },
+    { id:11, name:'Person K', tag:'Product', stage:'brewing', blurb:'A compact soil-testing device for balcony gardeners.' },
+    { id:12, name:'Person L', tag:'Service', stage:'poured', blurb:'Streamlining how street vendors renew municipal licenses.' },
+    { id:13, name:'Person M', tag:'Research', stage:'grounds', blurb:'Understanding trust breakdowns in second-hand marketplaces.' },
+    { id:14, name:'Person N', tag:'Interaction', stage:'steeping', blurb:'Gesture controls for hands-free cooking in small kitchens.' },
+    { id:15, name:'Person O', tag:'Systems', stage:'brewing', blurb:'A shared language for describing accessibility needs across campus.' }
+  ];
+
+  var TAGS = ['All','Product','Service','Research','Interaction','Systems'];
+
+  // ---------- seeded rng for stable blobs ----------
+  function seededRandom(seed){
+    var s = seed % 2147483647; if (s <= 0) s += 2147483646;
+    return function(){ s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+  }
+
+  function getCssVar(name){
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function drawBlob(canvas, seed, big){
+    if (!canvas) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = canvas.clientWidth || (big ? 500 : 200);
+    var h = canvas.clientHeight || (big ? 140 : 88);
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+
+    var rand = seededRandom(seed * 97 + 13);
+    var cx = w/2, cy = h/2;
+    var baseR = Math.min(w,h) * (big ? 0.34 : 0.36);
+    var points = 10;
+    var palette = [getCssVar('--lime'), getCssVar('--teal'), getCssVar('--amber')];
+    var color = palette[seed % palette.length];
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.beginPath();
+    var verts = [];
+    for (var i=0;i<points;i++){
+      var ang = (i/points) * Math.PI * 2;
+      var r = baseR * (0.72 + rand()*0.5);
+      verts.push([Math.cos(ang)*r, Math.sin(ang)*r]);
+    }
+    ctx.moveTo((verts[0][0]+verts[points-1][0])/2, (verts[0][1]+verts[points-1][1])/2);
+    for (var j=0;j<points;j++){
+      var cur = verts[j], nxt = verts[(j+1)%points];
+      var midX = (cur[0]+nxt[0])/2, midY=(cur[1]+nxt[1])/2;
+      ctx.quadraticCurveTo(cur[0], cur[1], midX, midY);
+    }
+    ctx.closePath();
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    // small satellite dots ("culture" flecks)
+    var flecks = big ? 10 : 5;
+    for (var k=0;k<flecks;k++){
+      var fa = rand()*Math.PI*2;
+      var fr = baseR * (1.05 + rand()*0.55);
+      var fx = Math.cos(fa)*fr, fy = Math.sin(fa)*fr;
+      var fsize = 1.5 + rand()* (big ? 4 : 2.5);
+      ctx.globalAlpha = 0.35 + rand()*0.4;
+      ctx.beginPath();
+      ctx.arc(fx, fy, fsize, 0, Math.PI*2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // ---------- render filters ----------
+  var filtersEl = document.getElementById('filters');
+  var activeTag = 'All';
+  TAGS.forEach(function(tag){
+    var btn = document.createElement('button');
+    btn.textContent = tag;
+    btn.setAttribute('aria-pressed', tag === 'All' ? 'true' : 'false');
+    btn.addEventListener('click', function(){
+      activeTag = tag;
+      Array.prototype.forEach.call(filtersEl.children, function(b){
+        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+      });
+      applyFilter();
+    });
+    filtersEl.appendChild(btn);
+  });
+
+  // ---------- render grid ----------
+  var gridEl = document.getElementById('grid');
+  var emptyMsg = document.getElementById('emptyMsg');
+
+  projects.forEach(function(p, idx){
+    var card = document.createElement('button');
+    card.className = 'card';
+    card.style.animationDelay = (idx * 0.04) + 's';
+    card.setAttribute('data-tag', p.tag);
+    card.setAttribute('type', 'button');
+    card.innerHTML =
+      '<div class="card-top">' +
+        '<span class="card-id mono">No. ' + String(p.id).padStart(2,'0') + '</span>' +
+        '<span class="stage stage-' + p.stage + '">' + STAGE_LABEL[p.stage] + '</span>' +
+      '</div>' +
+      '<canvas class="blob" aria-hidden="true"></canvas>' +
+      '<h3>' + p.name + '</h3>' +
+      '<span class="tag mono">' + p.tag + '</span>' +
+      '<p class="blurb">' + p.blurb + '</p>';
+    card.addEventListener('click', function(){ openModal(p); });
+    gridEl.appendChild(card);
+
+    var cv = card.querySelector('canvas.blob');
+    requestAnimationFrame(function(){ drawBlob(cv, p.id, false); });
+  });
+
+  function applyFilter(){
+    var visible = 0;
+    Array.prototype.forEach.call(gridEl.children, function(card){
+      var match = activeTag === 'All' || card.getAttribute('data-tag') === activeTag;
+      card.classList.toggle('hidden-item', !match);
+      if (match) visible++;
+    });
+    emptyMsg.style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  // ---------- modal ----------
+  var backdrop = document.getElementById('modalBackdrop');
+  var modalBlob = document.getElementById('modalBlob');
+  var lastFocused = null;
+
+  function openModal(p){
+    lastFocused = document.activeElement;
+    document.getElementById('modalId').textContent = 'No. ' + String(p.id).padStart(2,'0');
+    document.getElementById('modalName').textContent = p.name;
+    document.getElementById('modalTag').textContent = p.tag;
+    var stageEl = document.getElementById('modalStage');
+    stageEl.textContent = STAGE_LABEL[p.stage];
+    stageEl.className = 'stage stage-' + p.stage;
+    document.getElementById('modalDesc').textContent = p.blurb;
+    backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function(){ drawBlob(modalBlob, p.id, true); });
+    document.getElementById('modalClose').focus();
+  }
+  function closeModal(){
+    backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+    if (lastFocused) lastFocused.focus();
+  }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  backdrop.addEventListener('click', function(e){ if (e.target === backdrop) closeModal(); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal();
+  });
+
+  // ---------- hero canvas ambient brew animation ----------
+  var brewCanvas = document.getElementById('brewCanvas');
+  var bctx = brewCanvas.getContext('2d');
+  var particles = [];
+  var animId = null;
+
+  function sizeBrewCanvas(){
+    var hero = document.querySelector('.hero');
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = hero.clientWidth, h = hero.clientHeight;
+    brewCanvas.width = w * dpr; brewCanvas.height = h * dpr;
+    brewCanvas.style.width = w + 'px'; brewCanvas.style.height = h + 'px';
+    bctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function initParticles(){
+    var hero = document.querySelector('.hero');
+    var w = hero.clientWidth, h = hero.clientHeight;
+    var count = Math.round(Math.min(30, Math.max(14, w/60)));
+    particles = [];
+    var rand = seededRandom(42);
+    var colors = [getCssVar('--lime'), getCssVar('--teal'), getCssVar('--amber')];
+    for (var i=0;i<count;i++){
+      particles.push({
+        x: rand()*w, y: h + rand()*h*0.3,
+        r: 3 + rand()*10,
+        speed: 0.15 + rand()*0.35,
+        drift: (rand()-0.5)*0.3,
+        color: colors[i % colors.length],
+        alpha: 0.12 + rand()*0.22
+      });
+    }
+  }
+
+  function tickBrew(){
+    var hero = document.querySelector('.hero');
+    var w = hero.clientWidth, h = hero.clientHeight;
+    bctx.clearRect(0,0,w,h);
+    particles.forEach(function(p){
+      p.y -= p.speed;
+      p.x += Math.sin(p.y*0.01) * p.drift;
+      if (p.y < -20){ p.y = h + 20; p.x = Math.random()*w; }
+      bctx.beginPath();
+      bctx.globalAlpha = p.alpha;
+      bctx.fillStyle = p.color;
+      bctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      bctx.fill();
+    });
+    bctx.globalAlpha = 1;
+    animId = requestAnimationFrame(tickBrew);
+  }
+
+  function setupBrew(){
+    sizeBrewCanvas();
+    initParticles();
+    if (animId) cancelAnimationFrame(animId);
+    if (!reduceMotion) {
+      tickBrew();
+    } else {
+      // draw one static frame
+      var hero = document.querySelector('.hero');
+      bctx.clearRect(0,0,hero.clientWidth, hero.clientHeight);
+      particles.forEach(function(p){
+        bctx.beginPath(); bctx.globalAlpha = p.alpha; bctx.fillStyle = p.color;
+        bctx.arc(p.x, p.y, p.r, 0, Math.PI*2); bctx.fill();
+      });
+      bctx.globalAlpha = 1;
+    }
+  }
+
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(setupBrew, 150);
+  });
+
+  // ---------- counter ----------
+  var counted = false;
+  var countEl = document.getElementById('countStat');
+  function runCounter(){
+    if (counted) return;
+    counted = true;
+    var target = projects.length;
+    if (reduceMotion){ countEl.textContent = target; return; }
+    var start = null;
+    var dur = 900;
+    function step(ts){
+      if (!start) start = ts;
+      var progress = Math.min(1, (ts - start)/dur);
+      countEl.textContent = Math.round(progress * target);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ---------- reveal on scroll for redrawing blobs crisply once visible ----------
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && entry.target.id === 'top'){
+          runCounter();
+        }
+      });
+    }, { threshold: 0.4 });
+    io.observe(document.getElementById('top'));
+  } else {
+    runCounter();
+  }
+
+  // ---------- init ----------
+  applyFilter();
+  setupBrew();
+
+  // redraw blobs + brew canvas on theme change (system)
+  if (window.matchMedia){
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+      setTimeout(function(){
+        Array.prototype.forEach.call(document.querySelectorAll('.card'), function(card, idx){
+          drawBlob(card.querySelector('canvas.blob'), projects[idx].id, false);
+        });
+        setupBrew();
+      }, 50);
+    });
+  }
+})();
+</script>
