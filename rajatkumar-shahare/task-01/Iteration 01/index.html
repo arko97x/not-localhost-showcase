@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curated Archive — 9 Speculative Works</title>
+  <meta name="description" content="An editorial flip-book and spatial showcase of 9 speculative research projects by contemporary creators, built in the minimalist aesthetic of gilhuybrecht.com.">
+  
+  <!-- Minimalist Typography: LayGrotesk / Inter / JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+</head>
+<body class="editorial-body">
+
+  <!-- TOP EDITORIAL HEADER (Gil Huybrecht Style: stark, clean, typographic) -->
+  <header class="site-header">
+    <div class="header-left">
+      <a href="#" class="brand-link" id="btnLogo">
+        <span class="brand-num">09</span>
+        <span class="brand-title">SPECULATIVE ARCHIVE</span>
+      </a>
+      <span class="header-sep">/</span>
+      <span class="header-desc">Physical-Digital Prototypes & Speculative Systems</span>
+    </div>
+
+    <!-- View Mode Switcher: Pins Canvas vs Flip-Book Spread -->
+    <div class="header-modes">
+      <button id="btnModePins" class="mode-btn active">
+        <span class="mode-dot"></span> Pinned Overview
+      </button>
+      <button id="btnModeBook" class="mode-btn">
+        <span class="mode-dot"></span> Flip Book Spread
+      </button>
+    </div>
+
+    <div class="header-right">
+      <button id="btnAudioToggle" class="subtle-btn" title="Toggle Mechanical Audio Ticks">
+        Sound: On
+      </button>
+      <span class="header-date">Sept 2026</span>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       VIEW 1: SPATIAL PINNED OVERVIEW (A Glimpse of All 9 Works)
+       ========================================================================= -->
+  <main id="pinsView" class="view-container active-view">
+    <div class="pins-intro">
+      <div class="intro-col-left">
+        <p class="intro-eyebrow">CURATED COLLECTION</p>
+        <h2 class="intro-heading">9 Experimental Systems.<br>Nine Authors. One Archive.</h2>
+      </div>
+      <div class="intro-col-right">
+        <p class="intro-lead">
+          Explore the pinned prototypes below. Each pin offers a live algorithmic glimpse. Select any work to open the two-page editorial flip-book and interact directly with its code.
+        </p>
+      </div>
+    </div>
+
+    <!-- 9 Pinned Showcase Cards Grid -->
+    <div class="pins-grid" id="pinsGrid">
+      <!-- Injected via JavaScript with live canvas glimpses -->
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       VIEW 2: EDITORIAL FLIP BOOK SPREAD
+       Left Page: Deep research notes, author, and method
+       Right Page: The actual interactive project running live in HTML!
+       ========================================================================= -->
+  <section id="bookView" class="view-container">
+    <div class="book-container">
+      
+      <!-- Top Book Bar: Index Pagination & Exit -->
+      <div class="book-top-bar">
+        <div class="book-pagination">
+          <span class="page-current" id="bookPageIndicator">01 / 09</span>
+          <span class="book-project-category" id="bookHeaderCategory">Affective Computing</span>
+        </div>
+        <div class="book-controls">
+          <button id="btnPrevPage" class="nav-page-btn" title="Previous Work (Left Arrow)">← Prev</button>
+          <button id="btnNextPage" class="nav-page-btn" title="Next Work (Right Arrow)">Next →</button>
+          <button id="btnCloseBook" class="close-book-btn" title="Return to Pins Overview">✕ Close Book</button>
+        </div>
+      </div>
+
+      <!-- The Two-Page Open Spread -->
+      <div class="spread-wrapper">
+        
+        <!-- LEFT PAGE: Curated Editorial Article -->
+        <article class="spread-page page-left" id="leftPage">
+          <div class="page-inner">
+            <div class="page-header-meta">
+              <span class="meta-index" id="spreadIndex">01</span>
+              <span class="meta-category" id="spreadCategory">AFFECTIVE COMPUTING</span>
+            </div>
+
+            <h2 class="spread-title" id="spreadTitle">Freeing the Parrot</h2>
+            <div class="spread-byline">
+              <span>Author: <strong id="spreadCreator">msup96</strong></span>
+              <span class="byline-sep">•</span>
+              <a id="spreadGithubLink" href="#" target="_blank" rel="noopener" class="author-gh-link">@<span id="spreadHandle">msup96</span> ↗</a>
+            </div>
+
+            <blockquote class="spread-quote" id="spreadTagline">
+              "The machine doesn't know you. It just knows how to sound like it does."
+            </blockquote>
+
+            <div class="spread-section">
+              <h4 class="section-label">Research Abstract</h4>
+              <p class="spread-prose" id="spreadAbstract"></p>
+            </div>
+
+            <div class="spread-section">
+              <h4 class="section-label">Interaction & Engineering Method</h4>
+              <p class="spread-prose" id="spreadMethod"></p>
+            </div>
+
+            <div class="spread-section">
+              <h4 class="section-label">Technical Stack</h4>
+              <div class="tech-tag-row" id="spreadTechTags"></div>
+            </div>
+
+            <div class="spread-footer-cta">
+              <a id="spreadOpenGithubBtn" href="#" target="_blank" rel="noopener" class="gh-cta-btn">
+                <span>View Full Source on GitHub</span>
+                <span class="arrow">↗</span>
+              </a>
+              <div class="clone-snippet">
+                <code>git clone <span id="spreadCloneUrl">https://github.com/...</span></code>
+                <button id="btnCopySpreadClone" class="copy-snippet-btn">Copy</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Book Spine Divider -->
+        <div class="spread-spine"></div>
+
+        <!-- RIGHT PAGE: The Live Working Interactive HTML Project! -->
+        <section class="spread-page page-right" id="rightPage">
+          <div class="page-inner live-app-frame">
+            <header class="app-frame-header">
+              <div class="frame-status">
+                <span class="status-indicator"></span>
+                <span class="status-label">LIVE ENVIRONMENT • REPO RE-CREATION</span>
+              </div>
+              <span class="frame-hint" id="frameHint">Interact with the prototype below</span>
+            </header>
+
+            <!-- Dynamic Live HTML Prototype Container -->
+            <div class="app-frame-content" id="liveInteractiveContainer">
+              <!-- Dynamically populated based on active project -->
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Bottom Book Footer Nav -->
+      <footer class="book-bottom-nav">
+        <span class="footer-keyboard-hint">Keyboard: Use [ ← ] and [ → ] arrow keys to turn pages • [ Esc ] to close</span>
+        <div class="book-pager-pills" id="bookPagerPills">
+          <!-- 01, 02, 03... jump pills -->
+        </div>
+      </footer>
+
+    </div>
+  </section>
+
+  <!-- Audio elements & Core Engine -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
