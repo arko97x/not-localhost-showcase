@@ -1,0 +1,6 @@
+{
+  "name": "Liminal Multiverse",
+  "description": "An immersive speculative design observatory exploring surveillance, synthetic intelligence, and uncanny post-human futures.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
