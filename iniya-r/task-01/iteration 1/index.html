@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VEND YOUR SIMULATION</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap');
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{background:#f3dd00;font-family:"Space Mono",monospace;color:#180321}
+canvas{display:block;width:100%;height:100%;cursor:grab}canvas:active{cursor:grabbing}
+.title{position:fixed;z-index:5;top:21px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;width:100%}
+.title .small{font:700 10px "Space Mono";letter-spacing:.24em}
+.title h1{margin:8px 0 0;font:clamp(40px,6.2vw,86px)/.86 "Archivo Black";letter-spacing:-.055em;text-shadow:5px 5px 0 rgba(255,255,255,.15)}
+.title h1 span{color:#4b087d}
+.controls{position:fixed;z-index:6;left:24px;bottom:24px;padding:12px 15px;background:rgba(255,240,35,.88);border:1px solid rgba(75,8,125,.35);box-shadow:5px 5px 0 rgba(75,8,125,.15);font-size:9px;font-weight:700;line-height:1.7;letter-spacing:.08em;pointer-events:none}
+.controls b{color:#4b087d}
+.status{position:fixed;z-index:6;right:24px;bottom:24px;padding:12px 15px;background:#180321;color:#fff;font-size:9px;letter-spacing:.08em;pointer-events:none;min-width:210px;text-align:center}
+.status .name{color:#ffe000;font-weight:700}
+.reset{position:fixed;z-index:7;right:24px;top:24px;border:0;padding:10px 14px;background:#4b087d;color:white;font:700 9px "Space Mono";letter-spacing:.08em;cursor:pointer;box-shadow:4px 4px 0 rgba(30,0,45,.25)}
+.vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 48%,transparent 48%,rgba(54,4,65,.12))}
+@media(max-width:700px){.title h1{font-size:43px}.controls{left:10px;bottom:10px;font-size:8px}.status{right:10px;bottom:10px;min-width:175px}.reset{right:10px;top:10px}}
+</style>
+</head>
+<body>
+<div class="title"><div class="small">STUDENT SIMULATION MARKET • 013</div><h1>VEND YOUR <span>SIMULATION</span></h1></div>
+<button class="reset" id="reset">RESET VIEW</button>
+<div class="controls"><b>DRAG</b> → rotate the machine<br><b>SCROLL / PINCH</b> → zoom<br><b>CLICK A CAN</b> → vend it</div>
+<div class="status" id="status">MACHINE READY<br><span class="name">SELECT A SNACK</span></div>
+<div class="vignette"></div>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.18;
+document.body.appendChild(renderer.domElement);
+
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0xf3dd00); scene.fog=new THREE.Fog(0xf3dd00,13,27);
+const camera=new THREE.PerspectiveCamera(35,innerWidth/innerHeight,.1,100); camera.position.set(0,.9,13.8);
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true; controls.enablePan=false; controls.minDistance=8; controls.maxDistance=20;
+controls.minPolarAngle=1.02; controls.maxPolarAngle=2.08; controls.target.set(0,.1,0);
+
+scene.add(new THREE.HemisphereLight(0xfff6a0,0x260334,2.5));
+const key=new THREE.DirectionalLight(0xffffff,4.4); key.position.set(6,10,8); key.castShadow=true; key.shadow.mapSize.set(2048,2048); scene.add(key);
+const pl=new THREE.PointLight(0xa72cff,85,13); pl.position.set(-3,2,2); scene.add(pl);
+const pk=new THREE.PointLight(0xff2ab9,65,11); pk.position.set(3,1,1); scene.add(pk);
+
+const machine=new THREE.Group(); machine.position.y=-.1; scene.add(machine);
+const matPurple=new THREE.MeshStandardMaterial({color:0x4b087d,metalness:.72,roughness:.2});
+const matDark=new THREE.MeshStandardMaterial({color:0x170323,metalness:.82,roughness:.18});
+const matYellow=new THREE.MeshStandardMaterial({color:0xffe000,metalness:.28,roughness:.28});
+const matSilver=new THREE.MeshStandardMaterial({color:0xe8deef,metalness:.9,roughness:.18});
+const matGlass=new THREE.MeshPhysicalMaterial({color:0x9c49c5,transparent:true,opacity:.16,roughness:.04,metalness:.05,transmission:.18});
+const matBack=new THREE.MeshStandardMaterial({color:0x28103d,roughness:.5});
+const neon=new THREE.MeshStandardMaterial({color:0xff2ab8,emissive:0xff2ab8,emissiveIntensity:4});
+function cube(w,h,d,mat,x,y,z,parent=machine){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d,2,2,2),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+
+cube(7,8.6,2.45,matPurple,0,.25,0); cube(6.55,7.35,.18,matDark,0,.55,-1.28);
+cube(6.65,.28,2.25,matDark,0,4.58,0); cube(6.65,.28,2.25,matDark,0,-4.02,0);
+cube(.28,7.65,2.25,matDark,-3.2,.3,0); cube(.28,7.65,2.25,matDark,3.2,.3,0);
+cube(5.98,6.95,.1,matGlass,0,.72,-1.39); cube(5.75,6.65,.08,matBack,0,.72,-1.48);
+
+const rows=[2.72,.85,-1.03];
+rows.forEach(y=>{cube(5.62,.12,.34,matSilver,0,y,-1.63);cube(5.62,.045,.1,neon,0,y-.1,-1.67)});
+cube(.055,6.95,.06,neon,-3,.72,-1.48); cube(.055,6.95,.06,neon,3,.72,-1.48);
+
+cube(5.7,.72,.18,matYellow,0,4.05,-1.36);
+const logoCanvas=document.createElement('canvas'); logoCanvas.width=1024; logoCanvas.height=180;
+const lc=logoCanvas.getContext('2d'); lc.fillStyle='#ffe000'; lc.fillRect(0,0,1024,180); lc.fillStyle='#4b087d';
+lc.font='900 82px Arial Black,Arial'; lc.textAlign='center'; lc.textBaseline='middle'; lc.fillText('SIMULAB™',512,94);
+const logo=new THREE.Mesh(new THREE.PlaneGeometry(5.2,.62),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(logoCanvas),transparent:true}));
+logo.position.set(0,4.05,-1.47); machine.add(logo);
+
+cube(5.8,.95,.42,matDark,0,-2,-1.43); cube(3.25,.5,.08,new THREE.MeshStandardMaterial({color:0x321044,emissive:0x160522}),-.8,-2,-1.67);
+cube(1.6,.5,.08,matYellow,1.95,-2,-1.67);
+cube(5.8,.75,.5,matDark,0,-3,-1.38); cube(2.8,.30,.12,new THREE.MeshStandardMaterial({color:0x07020b}),0,-3,-1.7);
+cube(2.35,.055,.05,neon,0,-2.83,-2.05);
+
+const projects=[
+ ['AERO',0xff36b9,'demo-01.html'],['PIXEL',0x38eaff,'demo-02.html'],['NOVA',0x9b5cff,'demo-03.html'],['ECHO',0xff743b,'demo-04.html'],['VOLT',0x63ff63,'demo-05.html'],
+ ['MISO',0xff5e92,'demo-06.html'],['KITE',0xffd62e,'demo-07.html'],['BYTE',0x7777ff,'demo-08.html'],['LUMA',0xff45dc,'demo-09.html'],['ZIGGY',0x38ffd0,'demo-10.html'],
+ ['ORBIT',0xff7137,'demo-11.html'],['PICO',0xb8ff35,'demo-12.html'],['SONIC',0x5da8ff,'demo-13.html']
+];
+const cans=[];
+function makeCan(name,color,index){
+ const g=new THREE.Group();
+ const body=new THREE.Mesh(new THREE.CylinderGeometry(.37,.37,1.45,40),new THREE.MeshStandardMaterial({color,metalness:.65,roughness:.22})); body.castShadow=true; g.add(body);
+ const top=new THREE.Mesh(new THREE.CylinderGeometry(.335,.335,.045,40),matSilver); top.position.y=.745; g.add(top);
+ const tab=new THREE.Mesh(new THREE.TorusGeometry(.13,.024,8,30),matDark); tab.rotation.x=Math.PI/2; tab.position.y=.77; g.add(tab);
+ const c=document.createElement('canvas'); c.width=512;c.height=150;const x=c.getContext('2d');x.fillStyle='rgba(255,255,255,.9)';x.fillRect(0,38,512,74);x.fillStyle='#22052f';x.font='900 48px Arial Black,Arial';x.textAlign='center';x.textBaseline='middle';x.fillText(name,256,76);
+ const band=new THREE.Mesh(new THREE.CylinderGeometry(.375,.375,.42,40,1,true),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true}));band.position.y=-.04;g.add(band);
+ g.userData={index,name,url:projects[index][2]}; return g;
+}
+projects.forEach(([name,color,url],i)=>{const can=makeCan(name,color,i);const col=i%5,row=Math.floor(i/5);const pos=new THREE.Vector3((col-2)*1.08,rows[row]+.79,-2);can.position.copy(pos);can.rotation.z=(i%2?-.035:.035);can.userData.home=pos.clone();machine.add(can);cans.push(can)});
+
+const vending=new THREE.Group();scene.add(vending); const ray=new THREE.Raycaster(),pointer=new THREE.Vector2(); let busy=false;
+function status(a,b){document.getElementById('status').innerHTML=a+'<br><span class="name">'+b+'</span>'}
+
+function vend(index){
+ if(busy)return; busy=true; const can=cans[index]; const start=machine.localToWorld(can.position.clone()); machine.remove(can); vending.add(can); can.position.copy(start); can.rotation.set(0,0,0);
+ const finish=new THREE.Vector3(0,-2.55,-3.05), mid=new THREE.Vector3(start.x,-.9,-3.05), t0=performance.now(), dur=1500;
+ status('VENDING',can.userData.name);
+ function animateVend(now){
+  const p=Math.min(1,(now-t0)/dur);
+  if(p<.25){const q=p/.25;can.position.lerpVectors(start,mid,q*q);can.rotation.z=q*Math.PI*.8}
+  else{const q=(p-.25)/.75;const y=mid.y+(finish.y-mid.y)*q*q;can.position.set(0,y,-3.05);can.rotation.z=q*Math.PI*4;if(q>.88){const b=(q-.88)/.12;can.position.y=finish.y+Math.sin(b*Math.PI)*.13*(1-b)}}
+  if(p<1)requestAnimationFrame(animateVend);else{can.userData.ready=true;vending.userData.active=can;busy=false;status('SNACK READY','CLICK TO COLLECT')}}
+ requestAnimationFrame(animateVend);
+}
+
+function collect(){
+ const can=vending.userData.active;if(!can||!can.userData.ready)return;
+ status('OPENING','SIMULATION');const from=can.position.clone(),t0=performance.now();
+ function lift(now){const p=Math.min(1,(now-t0)/300);can.position.y=from.y+p*.5;can.scale.setScalar(1+.1*Math.sin(p*Math.PI));if(p<1)requestAnimationFrame(lift);else window.location.href=can.userData.url}
+ requestAnimationFrame(lift);
+}
+renderer.domElement.addEventListener('click',e=>{
+ pointer.x=e.clientX/innerWidth*2-1;pointer.y=-(e.clientY/innerHeight)*2+1;ray.setFromCamera(pointer,camera);
+ const active=vending.userData.active;if(active&&ray.intersectObject(active,true).length){collect();return}
+ if(busy)return;const hits=ray.intersectObjects(cans,true);if(!hits.length)return;let o=hits[0].object;while(o.parent&&o.parent!==machine)o=o.parent;vend(o.userData.index);
+});
+document.getElementById('reset').onclick=()=>{controls.target.set(0,.1,0);camera.position.set(0,.9,13.8);controls.update()};
+
+const floor=new THREE.Mesh(new THREE.CylinderGeometry(6.8,7.6,.28,64),new THREE.MeshStandardMaterial({color:0xe6cf00,roughness:.82}));floor.position.set(0,-4.35,0);floor.receiveShadow=true;scene.add(floor);
+const shadow=new THREE.Mesh(new THREE.CircleGeometry(4.8,64),new THREE.MeshBasicMaterial({color:0x4b087d,transparent:true,opacity:.17}));shadow.rotation.x=-Math.PI/2;shadow.scale.set(1.35,.65,1);shadow.position.set(0,-4.17,0);scene.add(shadow);
+
+function loop(){requestAnimationFrame(loop);const t=performance.now()/1000;machine.rotation.y=-.045+Math.sin(t*.4)*.015;cans.forEach((c,i)=>{if(c.parent===machine)c.position.y=c.userData.home.y+Math.sin(t*1.5+i)*.006});controls.update();renderer.render(scene,camera)}loop();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body></html>
