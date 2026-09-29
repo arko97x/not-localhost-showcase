@@ -1,0 +1,1183 @@
+/* Y2K Physical DVD Binder & CRT Monitor Environment */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+
+:root {
+  --y2k-bg: #070b11;
+  --y2k-blue: #00d2d3;
+  --y2k-cyan: #54a0ff;
+  --y2k-green: #00ff66;
+  --y2k-amber: #feca57;
+  --y2k-dark-panel: rgba(10, 16, 24, 0.88);
+  --y2k-border: rgba(0, 210, 211, 0.3);
+  --y2k-metal: linear-gradient(180deg, #3a4754 0%, #202b36 50%, #151d26 100%);
+  --y2k-metal-border: #4a5c6d;
+  --font-osd: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+  --font-tech: 'Share Tech Mono', 'Consolas', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--y2k-bg);
+  color: #d1d8e0;
+  font-family: var(--font-tech);
+}
+
+/* --- CRT MONITOR PHYSICAL EFFECTS --- */
+.crt-scanlines {
+  pointer-events: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 50;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
+  background-size: 100% 3px;
+  opacity: 0.85;
+}
+
+.crt-vignette {
+  pointer-events: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 51;
+  box-shadow: inset 0 0 100px rgba(0, 5, 15, 0.85), inset 0 0 40px rgba(0, 210, 211, 0.08);
+  background: radial-gradient(circle at center, transparent 65%, rgba(4, 7, 12, 0.7) 100%);
+}
+
+.crt-beam {
+  pointer-events: none;
+  position: fixed;
+  top: -100px; left: 0; width: 100%; height: 80px;
+  z-index: 52;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 210, 211, 0.03) 50%, transparent 100%);
+  animation: rollBeam 10s linear infinite;
+}
+
+@keyframes rollBeam {
+  0% { transform: translateY(-100px); }
+  100% { transform: translateY(115vh); }
+}
+
+/* --- 3D BINDER STAGE & PERSPECTIVE --- */
+#binder-viewport {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 1400px;
+  perspective-origin: 50% 50%;
+}
+
+.binder-stage {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-style: preserve-3d;
+}
+
+/* Floor contact shadow beneath floating wallet */
+.binder-floor-shadow {
+  position: absolute;
+  width: 460px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.3) 55%, transparent 75%);
+  filter: blur(16px);
+  transform: translateY(220px) rotateX(75deg);
+  pointer-events: none;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+/* --- THE PHYSICAL DVD BINDER ASSEMBLY --- */
+.physical-binder {
+  position: relative;
+  width: 380px;
+  height: 390px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.35, 1);
+}
+
+/* Closed state idle floating animation */
+.physical-binder.closed {
+  animation: binderFloatIdle 4.5s infinite ease-in-out;
+}
+
+@keyframes binderFloatIdle {
+  0%, 100% {
+    transform: translateY(-8px) rotateX(16deg) rotateY(-12deg) rotateZ(-2deg);
+  }
+  50% {
+    transform: translateY(8px) rotateX(13deg) rotateY(-9deg) rotateZ(-1deg);
+  }
+}
+
+/* --- 1. THE SPINE & VISIBLE HINGE --- */
+.binder-spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 52px;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: translateZ(0px);
+  z-index: 40;
+}
+
+.spine-cylinder {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #101720 0%, #24303f 45%, #151e29 100%);
+  border-radius: 14px 0 0 14px;
+  box-shadow: inset 2px 0 6px rgba(255, 255, 255, 0.18), inset -3px 0 8px rgba(0, 0, 0, 0.7);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Spine Metal Rivets */
+.spine-rivet {
+  position: absolute;
+  left: 18px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a4b0be 50%, #47535e 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  z-index: 2;
+}
+
+.rivet-top { top: 35px; }
+.rivet-mid { top: 50%; transform: translateY(-50%); }
+.rivet-bot { bottom: 35px; }
+
+/* Internal Metal Binder Rings */
+.binder-ring {
+  position: absolute;
+  right: -8px;
+  width: 22px;
+  height: 38px;
+  border: 4px solid #ccd1d9;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  transform: rotateY(70deg);
+  z-index: 45;
+}
+.ring-1 { top: 90px; }
+.ring-2 { bottom: 90px; }
+
+/* Wrist Strap */
+.spine-wrist-strap {
+  position: absolute;
+  left: -12px;
+  top: 50px;
+  transform-style: preserve-3d;
+}
+
+.strap-eyelet {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ced6e0 30%, #57606f 100%);
+  border: 2px solid #2f3542;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.strap-ribbon {
+  position: absolute;
+  left: 2px;
+  top: 12px;
+  width: 12px;
+  height: 85px;
+  background: linear-gradient(180deg, #2b3948 0%, #1a2531 100%);
+  border-radius: 6px;
+  transform: rotate(-8deg);
+  box-shadow: -2px 5px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* --- 2. THE BACK COVER --- */
+.binder-back-cover {
+  position: absolute;
+  left: 48px;
+  top: 0;
+  width: 332px;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: translateZ(-16px);
+  border-radius: 0 18px 18px 0;
+  z-index: 10;
+}
+
+.cover-texture-face.back-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #141b24 0%, #1f2a37 50%, #111720 100%);
+  border-radius: 0 18px 18px 0;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cover-inner-lining {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  background: #0d1218;
+  border-radius: 0 14px 14px 0;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+/* Perimeter Zipper Tracks */
+.zipper-edge {
+  position: absolute;
+  background: repeating-linear-gradient(
+    90deg,
+    #7a8d9f,
+    #7a8d9f 3px,
+    #1e2936 3px,
+    #1e2936 6px
+  );
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.top-zipper {
+  top: 0; left: 0; width: 100%; height: 5px;
+}
+
+.bottom-zipper {
+  bottom: 0; left: 0; width: 100%; height: 5px;
+}
+
+.right-zipper {
+  right: 0; top: 0; width: 5px; height: 100%;
+  background: repeating-linear-gradient(
+    180deg,
+    #7a8d9f,
+    #7a8d9f 3px,
+    #1e2936 3px,
+    #1e2936 6px
+  );
+}
+
+/* --- 3. THE FRONT COVER (HINGED AROUND LEFT SPINE) --- */
+.binder-front-cover {
+  position: absolute;
+  left: 48px;
+  top: 0;
+  width: 332px;
+  height: 100%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg) translateZ(32px);
+  border-radius: 0 18px 18px 0;
+  transition: transform 0.75s cubic-bezier(0.25, 1, 0.35, 1);
+  cursor: pointer;
+  z-index: 350;
+}
+
+.physical-binder.closed .binder-front-cover {
+  transform: rotateY(0deg) translateZ(32px);
+  z-index: 350;
+}
+
+.physical-binder.open .binder-front-cover {
+  transform: rotateY(-138deg) translateZ(0px);
+}
+
+/* Outer Face (visible when closed) */
+.cover-texture-face.front-outer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(28, 38, 50, 0.95) 0%, rgba(18, 25, 34, 0.96) 60%, rgba(10, 15, 21, 0.98) 100%);
+  border-radius: 0 18px 18px 0;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  overflow: hidden;
+}
+
+/* Frosted Circular Window (Reveals disc through closed case!) */
+.frosted-window-frame {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 4px solid #3d4f61;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(0, 0, 0, 0.5);
+  background: rgba(144, 202, 249, 0.18);
+  backdrop-filter: blur(4px);
+  overflow: hidden;
+}
+
+.frosted-window-glass {
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.35) 0%, rgba(84, 160, 255, 0.12) 40%, rgba(0, 0, 0, 0.3) 100%);
+  border-radius: 50%;
+}
+
+.window-disc-glint {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.3) 50%, transparent 60%);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+/* Window Perimeter Rivet Bolts */
+.window-rim-bolts .bolt {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #e2e8f0 30%, #64748b 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.b1 { top: 6px; left: 50%; transform: translateX(-50%); }
+.b2 { bottom: 6px; left: 50%; transform: translateX(-50%); }
+.b3 { left: 6px; top: 50%; transform: translateY(-50%); }
+.b4 { right: 6px; top: 50%; transform: translateY(-50%); }
+
+/* Physical Dymo/Metallic Label Sticker */
+.physical-label-sticker {
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  background: linear-gradient(180deg, #bcc5cf 0%, #e2e7ec 30%, #9ea9b5 70%, #7a8591 100%);
+  border: 2px solid #2f3542;
+  border-radius: 4px;
+  padding: 6px 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6), inset 0 1px 1px #ffffff;
+}
+
+.sticker-border {
+  background: #0a1118;
+  border: 1px solid #34495e;
+  border-radius: 2px;
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.sticker-line-1 {
+  font-family: var(--font-osd);
+  font-size: 26px;
+  color: var(--y2k-blue);
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px var(--y2k-blue);
+  line-height: 1;
+}
+
+.sticker-line-2 {
+  font-family: var(--font-tech);
+  font-size: 13px;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 2px;
+  margin-top: 2px;
+}
+
+.sticker-sub {
+  font-family: monospace;
+  font-size: 8px;
+  color: #718093;
+  margin-top: 2px;
+}
+
+/* Zipper Slider Pull Tab */
+.zipper-slider-pull {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  transform-style: preserve-3d;
+}
+
+.slider-box {
+  width: 14px;
+  height: 12px;
+  background: linear-gradient(135deg, #dcdde1, #718093);
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.slider-tab {
+  width: 8px;
+  height: 24px;
+  background: linear-gradient(180deg, #dcdde1, #57606f);
+  border-radius: 2px;
+  margin-left: 3px;
+  box-shadow: -1px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Inner Face of Front Cover (visible when opened) */
+.cover-texture-face.front-inner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #0e141c;
+  border-radius: 18px 0 0 18px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+}
+
+.inner-felt-pattern {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(45deg, #0e141c, #0e141c 4px, #131b24 4px, #131b24 8px);
+  opacity: 0.6;
+}
+
+.inner-window-back {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 4px solid #1c2734;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* --- 4. THE 15 DVD SLEEVES --- */
+.sleeves-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.sleeve-page {
+  position: absolute;
+  left: 52px;
+  top: 10px;
+  width: 316px;
+  height: 370px;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), 
+              filter 0.4s ease, 
+              box-shadow 0.4s ease;
+  cursor: pointer;
+}
+
+/* Hinge binding tab with metal eyelet holes */
+.sleeve-hinge-tab {
+  position: absolute;
+  left: -8px;
+  top: 0;
+  width: 14px;
+  height: 100%;
+  background: #253342;
+  border-radius: 4px 0 0 4px;
+}
+
+.sleeve-eyelet {
+  position: absolute;
+  left: 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #090e14;
+  border: 2px solid #a4b0be;
+}
+.eyelet-top { top: 95px; }
+.eyelet-bot { bottom: 95px; }
+
+/* Non-woven spunbond dimpled cloth backing */
+.sleeve-cloth-backing {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: #f0f3f6;
+  background-image: radial-gradient(#c8d1d9 16%, transparent 17%);
+  background-size: 8px 8px;
+  border-radius: 0 14px 14px 0;
+  border: 1px solid #b8c4ce;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15);
+  backface-visibility: visible;
+}
+
+/* Clear plastic pocket with thumb notch */
+.sleeve-plastic-pocket {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(0.5px);
+  border-radius: 0 12px 12px 0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+/* Top curved thumb notch cutout */
+.pocket-thumb-notch {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  height: 24px;
+  background: #e4e9ed;
+  border-radius: 0 0 35px 35px;
+  border: 1px solid #b8c4ce;
+  border-top: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.plastic-specular-glare {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, transparent 45%);
+}
+
+.pocket-reinforced-trim {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  border: 2px dashed rgba(52, 73, 94, 0.35);
+  border-radius: 0 12px 12px 0;
+}
+
+/* --- THE DVD DISC INSIDE THE POCKET --- */
+.dvd-disc {
+  position: absolute;
+  left: 28px;
+  top: 55px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), 
+              box-shadow 0.45s ease;
+  transform-style: preserve-3d;
+}
+
+.disc-canvas-container canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Transparent hub ring & spindle hole */
+.disc-clear-hub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.disc-spindle-hole {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e4e9ed;
+  border: 2px solid rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.6);
+}
+
+/* Iridescent holographic rainbow sheen */
+.disc-iridescent-sheen {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 45deg,
+    rgba(255, 0, 0, 0.15),
+    rgba(255, 255, 0, 0.15),
+    rgba(0, 255, 0, 0.15),
+    rgba(0, 255, 255, 0.2),
+    rgba(0, 0, 255, 0.15),
+    rgba(255, 0, 255, 0.15),
+    rgba(255, 0, 0, 0.15)
+  );
+  pointer-events: none;
+  mix-blend-mode: color-dodge;
+  opacity: 0.65;
+}
+
+/* Ejected / Inspected Disc State: Slides smoothly out of pocket! */
+.dvd-disc.ejected {
+  transform: translateY(-135px) translateZ(90px) rotateY(16deg) scale(1.18);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 210, 211, 0.4);
+  z-index: 200;
+}
+
+/* In-flight sleeve page elevation and dynamic shadow */
+.sleeve-page.is-flipping {
+  z-index: 350 !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 210, 211, 0.3) !important;
+  filter: brightness(1.12) !important;
+}
+
+/* --- Y2K MINIMAL OSD UI OVERLAY --- */
+#ui-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 20;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+#ui-overlay > * {
+  pointer-events: auto;
+}
+
+/* Top System Header */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-osd);
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.osd-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--y2k-blue);
+  text-shadow: 0 0 8px rgba(0, 210, 211, 0.6);
+  background: rgba(10, 16, 24, 0.8);
+  border: 1px solid var(--y2k-border);
+  padding: 4px 12px;
+  border-radius: 2px;
+}
+
+.blink-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--y2k-green);
+  box-shadow: 0 0 6px var(--y2k-green);
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.top-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.osd-btn {
+  background: var(--y2k-metal);
+  border: 1px solid var(--y2k-metal-border);
+  color: #b0bec5;
+  font-family: var(--font-osd);
+  font-size: 16px;
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.osd-btn:hover {
+  color: #ffffff;
+  border-color: var(--y2k-blue);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 8px rgba(0, 210, 211, 0.4);
+}
+
+.osd-btn.active {
+  color: var(--y2k-blue);
+  border-color: var(--y2k-blue);
+  background: #142332;
+  box-shadow: 0 0 10px rgba(0, 210, 211, 0.5);
+}
+
+/* Prompt in Closed State */
+#closed-prompt-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, calc(-50% + 195px));
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.closed-prompt {
+  font-family: var(--font-osd);
+  font-size: 22px;
+  color: var(--y2k-blue);
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 210, 211, 0.8);
+  background: rgba(8, 14, 22, 0.88);
+  border: 1px solid var(--y2k-border);
+  padding: 6px 18px;
+  display: inline-block;
+  animation: pulsePrompt 2s infinite ease-in-out;
+}
+
+.closed-hint {
+  font-size: 11px;
+  color: #636e72;
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+@keyframes pulsePrompt {
+  0%, 100% { opacity: 0.5; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+/* --- OPEN STATE: COMPACT Y2K DISC OSD BOX --- */
+#disc-osd-panel {
+  position: absolute;
+  bottom: 84px;
+  left: 20px;
+  width: 320px;
+  background: var(--y2k-dark-panel);
+  border: 1px solid var(--y2k-border);
+  border-radius: 4px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0, 210, 211, 0.05);
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: none;
+}
+
+#disc-osd-panel.visible {
+  display: block;
+}
+
+.osd-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed rgba(0, 210, 211, 0.3);
+  padding-bottom: 5px;
+  margin-bottom: 8px;
+  font-family: var(--font-osd);
+  font-size: 16px;
+  color: var(--y2k-blue);
+  text-shadow: 0 0 5px rgba(0, 210, 211, 0.5);
+}
+
+.osd-format-tag {
+  background: #2b394a;
+  color: #ffffff;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.osd-title {
+  font-family: var(--font-osd);
+  font-size: 26px;
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 1.1;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  margin-bottom: 4px;
+}
+
+.osd-meta-row {
+  font-size: 11px;
+  color: var(--y2k-amber);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.osd-synopsis {
+  font-size: 12px;
+  color: #a4b0be;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.osd-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.osd-action-btn {
+  flex: 1;
+  background: var(--y2k-metal);
+  border: 1px solid var(--y2k-metal-border);
+  color: #ffffff;
+  font-family: var(--font-osd);
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.osd-action-btn:hover {
+  background: #1b3046;
+  border-color: var(--y2k-blue);
+  color: var(--y2k-blue);
+  box-shadow: 0 0 8px rgba(0, 210, 211, 0.4);
+}
+
+.osd-action-btn.primary {
+  border-color: var(--y2k-blue);
+  background: linear-gradient(180deg, #1b3a4b 0%, #0d2230 100%);
+  color: var(--y2k-blue);
+}
+
+/* --- BOTTOM NAVIGATION DOCK --- */
+#bottom-nav-dock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  align-self: center;
+  transition: opacity 0.3s ease;
+  display: none;
+}
+
+#bottom-nav-dock.visible {
+  display: flex;
+}
+
+.vcr-track-display {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(10, 16, 24, 0.85);
+  border: 1px solid var(--y2k-border);
+  padding: 4px 12px;
+  border-radius: 3px;
+}
+
+.vcr-segment {
+  width: 14px;
+  height: 8px;
+  background: #1e2938;
+  border: 1px solid #34495e;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vcr-segment:hover {
+  background: #54a0ff;
+  border-color: #ffffff;
+}
+
+.vcr-segment.active {
+  background: var(--y2k-blue);
+  border-color: #ffffff;
+  box-shadow: 0 0 8px var(--y2k-blue);
+}
+
+.media-controls-strip {
+  display: flex;
+  align-items: center;
+  background: var(--y2k-metal);
+  border: 2px solid var(--y2k-metal-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  gap: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.media-btn {
+  background: #1a232d;
+  border: 1px solid #384858;
+  color: #cfd8dc;
+  font-family: var(--font-osd);
+  font-size: 18px;
+  padding: 6px 14px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s ease;
+}
+
+.media-btn:hover:not(:disabled) {
+  background: #253342;
+  color: #ffffff;
+  border-color: var(--y2k-blue);
+}
+
+.media-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.media-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.osd-counter-readout {
+  font-family: var(--font-osd);
+  font-size: 22px;
+  color: var(--y2k-green);
+  text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+  background: #080e14;
+  border: 1px solid #1c2e22;
+  padding: 3px 12px;
+  border-radius: 2px;
+  letter-spacing: 2px;
+}
+
+/* --- CRT TV MODAL --- */
+#crt-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+#crt-modal.visible {
+  display: flex;
+}
+
+.crt-chassis {
+  width: 100%;
+  max-width: 760px;
+  background: #181d24;
+  border: 10px solid #28303d;
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+
+.crt-chassis-top {
+  background: #1f2530;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #141820;
+  font-family: var(--font-osd);
+  font-size: 16px;
+  color: #90a4ae;
+}
+
+.crt-inner-screen {
+  background: #050b12;
+  height: 400px;
+  margin: 12px;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.95);
+  border: 2px solid #101924;
+}
+
+.crt-inner-screen::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%),
+              linear-gradient(90deg, rgba(255,0,0,0.03), rgba(0,255,0,0.01), rgba(0,0,255,0.03));
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+.crt-tv-osd {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-osd);
+  font-size: 18px;
+  color: var(--y2k-green);
+  text-shadow: 0 0 8px var(--y2k-green);
+}
+
+.crt-disc-hero {
+  text-align: center;
+}
+
+.crt-disc-hero h2 {
+  font-family: var(--font-osd);
+  font-size: 44px;
+  color: #ffffff;
+  letter-spacing: 2px;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.7);
+}
+
+.crt-disc-hero p {
+  color: var(--y2k-amber);
+  font-family: var(--font-tech);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.crt-menu-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.crt-nav-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 255, 102, 0.35);
+  color: var(--y2k-green);
+  font-family: var(--font-osd);
+  font-size: 18px;
+  padding: 6px 20px;
+  width: 240px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-shadow: 0 0 6px var(--y2k-green);
+}
+
+.crt-nav-btn:hover {
+  background: rgba(0, 255, 102, 0.15);
+  border-color: var(--y2k-green);
+  box-shadow: 0 0 12px rgba(0, 255, 102, 0.4);
+  transform: scale(1.03);
+}
+
+.crt-tv-footer {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-osd);
+  font-size: 14px;
+  color: #54a0ff;
+  border-top: 1px dashed rgba(84, 160, 255, 0.3);
+  padding-top: 6px;
+}
+
+.crt-chassis-bot {
+  background: #1f2530;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- HELP MODAL --- */
+#help-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+#help-modal.visible {
+  display: flex;
+}
+
+.help-chassis {
+  background: #141c26;
+  border: 2px solid var(--y2k-border);
+  border-radius: 6px;
+  padding: 20px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.help-chassis h3 {
+  font-family: var(--font-osd);
+  font-size: 22px;
+  color: var(--y2k-blue);
+  margin-bottom: 12px;
+  border-bottom: 1px dashed var(--y2k-border);
+  padding-bottom: 4px;
+}
+
+.help-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 18px;
+}
+
+.help-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.help-key {
+  background: #253342;
+  border: 1px solid #4a5c6d;
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-family: var(--font-osd);
+  font-size: 14px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .physical-binder {
+    transform: scale(0.82);
+  }
+  #disc-osd-panel {
+    bottom: 80px;
+    left: 10px;
+    right: 10px;
+    width: calc(100% - 20px);
+    padding: 10px 12px;
+  }
+  .osd-synopsis {
+    display: none;
+  }
+  .media-btn {
+    padding: 5px 10px;
+    font-size: 15px;
+  }
+  .vcr-segment {
+    width: 9px;
+    height: 6px;
+  }
+}

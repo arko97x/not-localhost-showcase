@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DISCMAN '04 • 15-Disc Y2K DVD Wallet</title>
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <!-- 3D Physical CSS Binder Viewport -->
+  <div id="binder-viewport"></div>
+
+  <!-- CRT Monitor Physical Overlays -->
+  <div class="crt-scanlines"></div>
+  <div class="crt-vignette"></div>
+  <div class="crt-beam"></div>
+
+  <!-- Minimal Y2K OSD Overlay -->
+  <div id="ui-overlay">
+    <!-- Top System Bar -->
+    <header class="top-header">
+      <div class="osd-status">
+        <div class="blink-dot"></div>
+        <span id="system-status-text">DISCMAN-04 // 15-DISC OPTICAL WALLET // READY</span>
+      </div>
+
+      <div class="top-buttons">
+        <button id="btn-sound" class="osd-btn" title="Toggle Tactile Sounds (Off by default)">SOUND: OFF</button>
+        <button id="btn-help" class="osd-btn" title="Controls & Shortcuts">HELP ?</button>
+      </div>
+    </header>
+
+    <!-- Closed State Center Prompt -->
+    <div id="closed-prompt-container">
+      <div class="closed-prompt">▶ CLICK WALLET TO OPEN ◀</div>
+      <div class="closed-hint">[ CLICK OBJECT OR PRESS SPACE ]</div>
+    </div>
+
+    <!-- Open State: Compact Y2K Disc OSD Info Box -->
+    <aside id="disc-osd-panel">
+      <div class="osd-panel-header">
+        <span id="osd-index-tag">DISC 01 / 15</span>
+        <span id="osd-format-tag" class="osd-format-tag">DVD-VIDEO</span>
+      </div>
+      <h2 id="osd-disc-title" class="osd-title">THE MATRIX</h2>
+      <div id="osd-disc-meta" class="osd-meta-row">1999 • 136 MIN • REGION 1 NTSC</div>
+      <p id="osd-disc-synopsis" class="osd-synopsis">A hacker learns reality is a simulation controlled by machines.</p>
+      
+      <div class="osd-actions">
+        <button id="btn-osd-eject" class="osd-action-btn">⏏ EJECT DISC</button>
+        <button id="btn-osd-play" class="osd-action-btn primary">▶ PLAY PREVIEW</button>
+      </div>
+    </aside>
+
+    <!-- Open State: Bottom Media Player Navigation Dock -->
+    <footer id="bottom-nav-dock">
+      <!-- 15-Segment Optical Scrubber Track -->
+      <div class="vcr-track-display" id="vcr-track-display" title="Click any segment to jump to disc">
+        <!-- 15 clickable LED segments dynamically generated -->
+      </div>
+
+      <!-- Physical Media Controls Strip -->
+      <div class="media-controls-strip">
+        <button id="btn-nav-prev" class="media-btn" title="Previous Disc (Left Arrow / Swipe Right)">◄ PREV</button>
+        <div id="osd-counter-readout" class="osd-counter-readout">DISC 01 / 15</div>
+        <button id="btn-nav-next" class="media-btn" title="Next Disc (Right Arrow / Swipe Left / Space)">NEXT ►</button>
+        <button id="btn-close-wallet" class="media-btn" title="Close Wallet (O / Esc)">⏏ CLOSE</button>
+        <button id="btn-quick-play" class="media-btn" title="Open DVD Player (P)">▶ PLAY</button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- CRT TV DVD Player Screen Modal -->
+  <div id="crt-modal">
+    <div class="crt-chassis">
+      <div class="crt-chassis-top">
+        <span>TRINITRON // OPTICAL DVD PLAYER // 2004</span>
+        <span id="crt-status-indicator">● LASER ACTIVE</span>
+      </div>
+
+      <div class="crt-inner-screen">
+        <div class="crt-tv-osd">
+          <span id="crt-tv-format">DVD-VIDEO [MENU]</span>
+          <span id="crt-tv-time">00:00:00</span>
+          <span id="crt-tv-audio">DOLBY 5.1</span>
+        </div>
+
+        <div class="crt-disc-hero">
+          <h2 id="crt-tv-title">THE MATRIX</h2>
+          <p id="crt-tv-meta">1999 • WIDESCREEN PRESENTATION</p>
+        </div>
+
+        <div class="crt-menu-stack">
+          <button id="crt-menu-play" class="crt-nav-btn">▶ PLAY MOVIE</button>
+          <button id="crt-menu-scenes" class="crt-nav-btn">📑 SCENE SELECTION</button>
+          <button id="crt-menu-special" class="crt-nav-btn">⭐ SPECIAL FEATURES</button>
+          <button id="crt-menu-audio" class="crt-nav-btn">🔊 AUDIO SETUP</button>
+        </div>
+
+        <div class="crt-tv-footer">
+          <span>PRESS [ESC] OR CLICK EJECT TO RETURN TO WALLET</span>
+          <span id="crt-tv-region">REGION 1 NTSC</span>
+        </div>
+      </div>
+
+      <div class="crt-chassis-bot">
+        <span style="font-family: var(--font-tech); font-size: 11px; color: #78909c;">DOLBY DIGITAL • DTS SURROUND • COMPACT DISC</span>
+        <button id="crt-btn-close" class="media-btn" style="color: #ff6b81;">⏏ EJECT / RETURN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help / Shortcuts Modal -->
+  <div id="help-modal">
+    <div class="help-chassis">
+      <h3>DISCMAN '04 CONTROLS</h3>
+      <div class="help-grid">
+        <div class="help-row"><span>Open / Close Wallet</span> <span class="help-key">Click Object / O</span></div>
+        <div class="help-row"><span>Next DVD (Flip Forward)</span> <span class="help-key">→ / Space / Drag Left</span></div>
+        <div class="help-row"><span>Previous DVD (Flip Back)</span> <span class="help-key">← / Drag Right</span></div>
+        <div class="help-row"><span>Eject / Inspect Disc</span> <span class="help-key">Click Disc / E</span></div>
+        <div class="help-row"><span>DVD Player Preview</span> <span class="help-key">P / Enter</span></div>
+        <div class="help-row"><span>Toggle Sound Effects</span> <span class="help-key">M</span></div>
+        <div class="help-row"><span>3D Orbit Camera</span> <span class="help-key">Drag Background</span></div>
+        <div class="help-row"><span>Zoom In / Out</span> <span class="help-key">Scroll Wheel</span></div>
+      </div>
+      <button id="help-btn-close" class="osd-btn" style="width: 100%; text-align: center; margin-top: 10px;">OK</button>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
