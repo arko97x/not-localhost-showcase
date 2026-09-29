@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-syne: 'Syne', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    background-color: #080A10;
+    color: #F8FAFC;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom noise/texture layer */
+.bg-noise {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+.bg-linen {
+  background-color: #F7F4EE;
+  background-image: 
+    radial-gradient(#E5DEC9 0.75px, transparent 0.75px), 
+    radial-gradient(#D6CDAF 0.75px, #F7F4EE 0.75px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+.bg-mirror-grid {
+  background-color: #06070B;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Custom scrollbar for deep reading */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Prismatic chromatic glow */
+.prism-glow {
+  box-shadow: 
+    -2px 0 12px rgba(6, 182, 212, 0.35),
+    2px 0 12px rgba(236, 72, 153, 0.35),
+    0 0 20px rgba(255, 255, 255, 0.15);
+}
+
+/* Red thread pulsation */
+@keyframes threadPulse {
+  0%, 100% {
+    stroke-opacity: 0.85;
+    filter: drop-shadow(0 0 2px rgba(220, 38, 38, 0.6));
+  }
+  50% {
+    stroke-opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.9));
+  }
+}
+
+.animate-thread {
+  animation: threadPulse 3.5s ease-in-out infinite;
+}
+
+/* Dynamic Spring Physical Rebound Animation */
+@keyframes springOscillate {
+  0% { transform: scale(1) translateY(0) rotate(0deg); }
+  15% { transform: scale(1.03) translateY(-14px) rotate(-0.5deg); }
+  35% { transform: scale(0.98) translateY(8px) rotate(0.4deg); }
+  55% { transform: scale(1.015) translateY(-5px) rotate(-0.25deg); }
+  75% { transform: scale(0.995) translateY(2px) rotate(0.1deg); }
+  100% { transform: scale(1) translateY(0) rotate(0deg); }
+}
+
+@keyframes springSubtleVibrate {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px) rotate(-0.3deg); }
+  40% { transform: translateX(3px) rotate(0.3deg); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(1px); }
+}
+
+.animate-spring-rebound {
+  animation: springOscillate 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.animate-spring-vibrate {
+  animation: springSubtleVibrate 0.6s ease-in-out both;
+}
+

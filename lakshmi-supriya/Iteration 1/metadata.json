@@ -1,0 +1,6 @@
+{
+  "name": "SHAPESHIFTER",
+  "description": "A living shared digital showcase system for Experience Design students that shapeshifts form, archive language, and spatial physics based on creative DNA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
