@@ -1,11 +1,11 @@
 {
   "id": "haniya-hasim",
-  "url": "https://example.com",
+  "url": "https://mmow-designincubation.netlify.app",
   "code": "SPHERE-04 // HANIYA-HASIM",
   "title": "HANIYA HASIM",
-  "subtitle": "Project title goes here",
-  "year": "2050 CE",
-  "sector": "BIOMETRICS & PERCEPTION",
+  "subtitle": "Mirror, Mirror, on the wall",
+  "year": "2026",
+  "sector": "Exposing Protocols - Internet Walls",
   "themeColor": "#0288d1",
   "sphere": {
     "radius": 2.5,
@@ -45,12 +45,12 @@
   },
   "observerFigure": {
     "stance": "oracle",
-    "quote": "“A one-line description of the project goes here.”",
+    "quote": "“This project materialises the theory of internet walls and the workings of AI in it”",
     "beaconColor": "#00b0ff"
   },
   "wizardOwner": {
     "name": "Haniya Hasim",
     "wizardTitle": "Speculative Designer",
-    "avatarRune": "📜"
+    "avatarRune": "🧱"
   }
 }
